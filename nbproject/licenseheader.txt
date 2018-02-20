@@ -1,0 +1,8 @@
+<#if licenseFirst??>
+${licenseFirst}
+</#if>
+${licensePrefix}Under Beerlicense
+${licensePrefix}Andre Betz mail@Andrebetz.de ${licensePrefix}
+<#if licenseLast??>
+${licenseLast}
+</#if>
