@@ -15,7 +15,7 @@ import java.io.InputStream;
 
 /**
  *
- * @author betzan8u
+ * @author Andre Betz mail@Andrebetz.de
  */
 public class myC64Tools {
     public static byte[] readBinData(String filePath)  {

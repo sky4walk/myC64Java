@@ -7,7 +7,7 @@ package myc64emu;
 
 /**
  *
- * @author betzan8u
+ * @author Andre Betz mail@Andrebetz.de
  */
 public class myC64Config {
     // Speicherbelegung https://www.c64-wiki.de/wiki/Speicherbelegungsplan
@@ -41,6 +41,9 @@ public class myC64Config {
     public static int addrErweiterungenEnde             = 0xDFFF;      
     public static int addrKernalRomStart                = 0xE000;
     public static int addrKernalRomEnde                 = 0xFFFF;
+    
+    public static int addrDatenRichtungsReg             = 0x0000;
+    public static int addrProzessorPortReg              = 0x0001;
     
     public static int addrNMIVector             = 0xfffa;
 }
