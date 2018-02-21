@@ -15,7 +15,15 @@ public class MyC64Emu {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        
+        byte[] bin = myC64Tools.readBinData("D:\\betzan8u\\Download\\emudore-master\\assets\\roms\\basic.901226-01.bin");
+        myC64Tools.writeBinJavaString(bin, "D:\\betzan8u\\Download\\basic.java");
+        
+        bin = myC64Tools.readBinData("D:\\betzan8u\\Download\\emudore-master\\assets\\roms\\characters.901225-01.bin");
+        myC64Tools.writeBinJavaString(bin, "D:\\betzan8u\\Download\\char.java");
+        
+        bin = myC64Tools.readBinData("D:\\betzan8u\\Download\\emudore-master\\assets\\roms\\kernal.901227-03.bin");
+        myC64Tools.writeBinJavaString(bin, "D:\\betzan8u\\Download\\kernal.java");
     }
     
 }

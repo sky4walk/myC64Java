@@ -10,36 +10,36 @@ package myc64emu;
  * @author Andre Betz mail@AndreBetz.de
  */
 public class myC64Memory {
-    private byte[] memRam;
-    private byte[] memRom;    
+    private int[] memRam;
+    private int[] memRom;    
     private static int memSize = 0x10000;
     
     public void myC64Memory() {
-        memRam = new byte[memSize];
-        memRom = new byte[memSize];
+        memRam = new int[memSize];
+        memRom = new int[memSize];
     }
-    public byte readRamDirect(int addr) {
+    public int readRamDirect(int addr) {
         if ( 0 <= addr && addr < memSize ){
             return memRam[addr];
         } else {
             return 0;
         }
     }
-    public byte readRomDirect(int addr) {
+    public int readRomDirect(int addr) {
         if ( 0 <= addr && addr < memSize ){
             return memRom[addr];
         } else {
             return 0;
         }
     }
-    public void writeRAmDirect(int addr, byte val) {
+    public void writeRAmDirect(int addr, int val) {
         if ( 0 <= addr && addr < memSize ){
-            memRam[addr] = val;
+            memRam[addr] = val & 0xFF;
         } 
     }
-    public void writeRomDirect(int addr, byte val) {
+    public void writeRomDirect(int addr, int val) {
         if ( 0 <= addr && addr < memSize ){
-            memRom[addr] = val;
+            memRom[addr] = val & 0xFF;
         } 
     }
 }
