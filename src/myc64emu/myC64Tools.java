@@ -8,7 +8,6 @@ package myc64emu;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +25,6 @@ public class myC64Tools {
             allBytes = new byte[(int) fileSize];
              inputStream.read(allBytes);
         } catch (IOException ex) {
-            ex.printStackTrace();
 	}        
         return allBytes;
     }
@@ -47,7 +45,6 @@ public class myC64Tools {
             }
             out.flush();
         } catch (IOException ex) {
-            ex.printStackTrace();
         } 
     }        
     public static String byte2hex(byte val){

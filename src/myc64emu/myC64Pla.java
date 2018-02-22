@@ -80,7 +80,7 @@ public class myC64Pla {
      * Prozessorport werden nur HIRAM,LORAM und CHAREN verwendet
      * da die anderen Leitungen nicht aus der CPU kommen
      */
-    public int getProzessorport(int adr) {
+    public int getProzessorport() {
         return prozessorPort;
     }
     /**

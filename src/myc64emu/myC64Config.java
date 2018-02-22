@@ -35,8 +35,10 @@ public class myC64Config {
     public static int addrSidRegisterEnde               = 0xD7FF;  
     public static int addrFarbSpeicherStart             = 0xD800;  
     public static int addrFarbSpeicherEnde              = 0xDBFF;  
-    public static int addrCiaRegisterStart              = 0xDC00;  
-    public static int addrCiaRegisterEnde               = 0xDDFF;  
+    public static int addrCia1RegisterStart             = 0xDC00;  
+    public static int addrCia1RegisterEnde              = 0xDCFF;  
+    public static int addrCia2RegisterStart             = 0xDD00;  
+    public static int addrCia2RegisterEnde              = 0xDDFF;  
     public static int addrErweiterungenStart            = 0xDE00;  
     public static int addrErweiterungenEnde             = 0xDFFF;      
     public static int addrKernalRomStart                = 0xE000;

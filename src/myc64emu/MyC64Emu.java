@@ -28,6 +28,7 @@ public class MyC64Emu {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        MyC64Emu emu = new MyC64Emu();
     }
     
 }
