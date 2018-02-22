@@ -32,19 +32,30 @@ public class myC64CPU {
      *  Program Counter 16Bit 
      */
     private int regPC; 
+    /**
+     * count the cycles
+     */
+    private int cycleCntr;
     
     public myC64CPU(myC64Memory mem) {
         memory = mem;
         reset();
     }
-    
     private void reset() {
-        regA = 0;
-        regX = 0;
-        regY = 0;
+        regA  = 0;
+        regX  = 0;
+        regY  = 0;
         regSR = 0;
         regSP = 0;
-        regPC = 0;
+        regPC = memory.readSystemWord(myC64Config.addrResetVector);
+        cycleCntr = 0;
+    }
+    /**
+     * zaehlt die cycles.
+     * @param val cycles to add
+     */
+    private void addCycleCnt(int val) {
+        cycleCntr += val;
     }
     /**
      * negative flag
@@ -144,4 +155,72 @@ public class myC64CPU {
     private void setFlagC(boolean val){
         myC64Tools.setBit(regSR,0,val);
     }
+    /**
+     * get the actual operation
+     * @return operation 
+     */
+    public int getActOp() {
+        int val = memory.readSystemByte(regPC);
+        regPC++;
+        return val;
+    }
+    /**
+     * schreibt einen wert in den StackPointer
+     * @param val wert auf dem stapel ablegen.
+     */
+    private void push(int val) {
+        memory.writeSystemByte(
+                myC64Config.addrBaseStack+regSP, val);
+        regSP--;
+    }
+    /**
+     * liest vom Stapel einen wert.
+     * @return oberster stapel wert.
+     */
+    private int pop() {
+        regSP++;
+        return memory.readSystemByte(
+                    myC64Config.addrBaseStack+regSP);
+    }
+    /**
+     * https://www.c64-wiki.de/wiki/Opcode
+     * interpretiert die Opcodes.
+     */
+    public void interpreteOP() {
+        int op = getActOp();
+        switch(op) {
+            case 0x00: // BRK https://www.c64-wiki.de/wiki/BRK
+                brk();
+                break;
+                
+                
+        }
+    }
+    private void brk() {
+        getActOp();
+        push(myC64Tools.getHighByte(regPC));
+        setFlagB(true);
+        push(myC64Tools.getLowByte(regPC));
+        push(regSR);
+        setFlagI(true);
+        regPC = memory.readSystemWord(myC64Config.addrIRQVector);
+        addCycleCnt(7);
+    }
+    public void printOut() {
+        String outStr = "";
+        outStr += "regA: ";
+        outStr += myC64Tools.byte2hex(regA);
+        outStr += "\nregX: ";
+        outStr += myC64Tools.byte2hex(regX);
+        outStr += "\nregY: ";
+        outStr += myC64Tools.byte2hex(regY);
+        outStr += "\nregSR: ";
+        outStr += myC64Tools.byte2hex(regSR);
+        outStr += "\nregSP: ";
+        outStr += myC64Tools.byte2hex(regSP);
+        outStr += "\nregPC: ";
+        outStr += myC64Tools.byte2hex(regPC);
+        outStr += "\n";
+        myC64Tools.printOut( outStr );
+    } 
 }

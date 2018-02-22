@@ -39,7 +39,6 @@ public class myC64Tools {
                         outStr += "\n";
                     }
                 }
-                outStr += "0x";
                 outStr += byte2hex(binData[i]);
                 out.write(outStr);
             }
@@ -47,8 +46,12 @@ public class myC64Tools {
         } catch (IOException ex) {
         } 
     }        
-    public static String byte2hex(byte val){
-        return String.format("%02x", val);
+    public static String byte2hex(int val){
+        String outStr = "";
+        outStr += "0x";
+        outStr += myC64Tools.byte2hex( (byte)(val & 0xFF) );
+        outStr += String.format("%02x", val);
+        return outStr;
     }
     public static boolean testBit(int reg, int pos) {
         return (reg & (1 << pos)) != 0;
@@ -76,5 +79,8 @@ public class myC64Tools {
      */
     public static int getWord(int lowByte,int highByte) {
         return  highByte*256+lowByte;
+    }
+    public static void printOut(String text) {
+        System.out.println(text);
     }
 }

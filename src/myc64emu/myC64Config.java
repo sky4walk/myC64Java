@@ -45,7 +45,9 @@ public class myC64Config {
     public static int addrKernalRomEnde                 = 0xFFFF;
     
     public static int addrDatenRichtungsReg             = 0x0000;
-    public static int addrProzessorPortReg              = 0x0001;
-    
-    public static int addrNMIVector             = 0xfffa;
+    public static int addrProzessorPortReg              = 0x0001; 
+    public static int addrBaseStack                     = 0x0100;
+    public static int addrNMIVector                     = 0xFFFA;
+    public static int addrResetVector                   = 0xFFFC;
+    public static int addrIRQVector                     = 0xFFFE;
 }

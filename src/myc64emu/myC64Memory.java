@@ -5,6 +5,8 @@
 
 package myc64emu;
 
+import static myc64emu.myC64Tools.byte2hex;
+
 /**
  *
  * @author Andre Betz mail@AndreBetz.de
@@ -19,20 +21,31 @@ public class myC64Memory {
     public myC64Memory() {
         memRam = new int[memSize];
         memRom = new int[memSize];
-        loadRom(myC64Config.addrBasicRomStart,myC64RomBasic.mem);
+        loadRom(myC64Config.addrBasicRomStart,    myC64RomBasic.mem);
         loadRom(myC64Config.addrCharacterRomStart,myC64RomCharacters.mem);
-        loadRom(myC64Config.addrKernalRomStart,myC64RomKernal.mem);
+        loadRom(myC64Config.addrKernalRomStart,   myC64RomKernal.mem);
         reset();
     }
     public void reset() {
         pla.reset();
         pla.setCHAREN();
-        pla.clearHIRAM();
+        pla.setHIRAM();
         pla.setLORAM();
         writeRamByteDirect(
                 myC64Config.addrProzessorPortReg,
                 pla.getProzessorport());
     }
+    public int getMemRamSize() {
+        return memRam.length;
+    }
+    public int getMemRomSize() {
+        return memRom.length;
+    }
+    /**
+     * reads one byte from ram memory
+     * @param addr ram memory adress
+     * @return byte value
+     */
     public int readRamByteDirect(int addr) {
         if ( myC64Tools.isInsideAdr(0,memSize-1,addr) ){
             return memRam[addr] & 0xFF;
@@ -40,6 +53,11 @@ public class myC64Memory {
             return 0;
         }
     }
+    /**
+     * reads one byte from rom memory
+     * @param addr rom memory adress
+     * @return byte value
+     */
     public int readRomByteDirect(int addr) {
         if ( myC64Tools.isInsideAdr(0,memSize-1,addr) ){
             return memRom[addr] & 0xFF;
@@ -56,6 +74,28 @@ public class myC64Memory {
         if ( myC64Tools.isInsideAdr(0,memSize-1,addr) ){
             memRom[addr] = val & 0xFF;
         } 
+    }
+    public int readRamWordDirect(int addr) {
+        int lowByte  = readRamByteDirect(addr);
+        int highByte = readRamByteDirect(addr+1);
+        return myC64Tools.getWord(lowByte,highByte);
+    }
+    public int readSystemWord(int addr) {
+        int lowByte  = readSystemByte(addr);
+        int highByte = readSystemByte(addr+1);
+        return myC64Tools.getWord(lowByte,highByte);
+    }
+    public void writeRamWordDirect(int addr,int val) {
+        int lowByte  = myC64Tools.getLowByte(val);        
+        int highByte = myC64Tools.getHighByte(val);
+        writeRamByteDirect(addr,  lowByte);
+        writeRamByteDirect(addr+1,highByte);        
+    }
+    public void writeSystemWord(int addr,int val) {
+        int lowByte  = myC64Tools.getLowByte(val);        
+        int highByte = myC64Tools.getHighByte(val);
+        writeSystemByte(addr,  lowByte);
+        writeSystemByte(addr+1,highByte);        
     }
     public int readSystemByte(int addr){
         int retVal = 0;
@@ -161,15 +201,27 @@ public class myC64Memory {
         }
     }
     public void loadRom(int addrStart, int[] Rom) {
-        for (int i = 0; i < Rom.length; i++ ) {
+        for (int i = 0; i < getMemRomSize(); i++ ) {
             writeRomByteDirect(addrStart,Rom[i]);
             addrStart++;
         }        
     }
     public void loadRam(int addrStart, int[] Ram) {
-        for (int i = 0; i < Ram.length; i++ ) {
+        for (int i = 0; i < getMemRamSize(); i++ ) {
             writeRamByteDirect(addrStart,Ram[i]);
             addrStart++;
         }        
+    }
+    public void printOut() {
+        for (int i = 0; i < getMemRamSize(); i++ ) {
+            String outStr = "";
+            int val = readSystemByte(i);
+            outStr += "0x";
+            outStr += myC64Tools.byte2hex( (byte)(val & 0xFF) );
+            outStr += " ";
+            if ( i > 0 && (i % 10)==0 )
+                outStr += "\n";
+            myC64Tools.printOut( outStr );
+        }
     }
 }
