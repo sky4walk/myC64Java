@@ -53,4 +53,31 @@ public class myC64Tools {
     public static String byte2hex(byte val){
         return String.format("%02x", val);
     }
+    public static boolean testBit(int reg, int pos) {
+        return (reg & (1 << pos)) != 0;
+    }
+    public static int setBit(int reg, int pos, boolean val) {
+        if ( val )  return ( reg |  (1 << pos) );
+        else        return ( reg & ~(1 << pos) );
+    }
+    public static boolean isInsideAdr(int start, int end,int addr) {
+        return  ( start <= addr && end >= addr );
+    }
+    public static int getLowByte(int addr) {
+        return  addr & 0x00FF;
+    }
+    public static int getHighByte(int addr) {
+        return  addr & 0xFF00;
+    }
+    /**
+     * https://www.c64-wiki.de/wiki/Byte
+     * 16Bit Adressen werden im Ram in der Reihe
+     * Low Byte (adr) dann High Byte (adr+1) abgelegt
+     * @param lowByte low Byte (adr)
+     * @param highByte High Byte  (adr+1)
+     * @return 16Bit Adresse
+     */
+    public static int getWord(int lowByte,int highByte) {
+        return  highByte*256+lowByte;
+    }
 }

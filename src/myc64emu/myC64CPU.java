@@ -9,7 +9,7 @@ package myc64emu;
  *
  * @author Andre Betz mail@AndreBetz.de
  */
-public class mcC64CPU {
+public class myC64CPU {
     /**
      * memory 64KB
      */
@@ -33,7 +33,7 @@ public class mcC64CPU {
      */
     private int regPC; 
     
-    public void myC64Memory(myC64Memory mem) {
+    public myC64CPU(myC64Memory mem) {
         memory = mem;
         reset();
     }
@@ -51,111 +51,97 @@ public class mcC64CPU {
      * @return negative flag
      */
     private boolean getFlagN(){
-        if ( (regSR & 0x80) == 1 ) return true;
-        else return false;
+        return ( myC64Tools.testBit(regSR,7) );
     }
     /**
      * negative flag
      * @param val negative flag
      */
     private void setFlagN(boolean val){
-        if ( val ) regSR |= 0x80;
-        else regSR &= 0x7F;
+        myC64Tools.setBit(regSR,7,val);
     }
     /**
      * Overflow flag
      * @return overflow flag
      */
     private boolean getFlagV(){
-        if ( (regSR & 0x40) == 1 ) return true;
-        else return false;
+        return ( myC64Tools.testBit(regSR,6) );
     }
     /**
      * Overflow flag
      * @param val overflow flag
      */
     private void setFlagV(boolean val){
-        if ( val ) regSR |= 0x40;
-        else regSR &= 0xBF;
+        myC64Tools.setBit(regSR,6,val);
     }
    /**
      * Break flag
      * @return break flag
      */
     private boolean getFlagB(){
-        if ( (regSR & 0x10) == 1 ) return true;
-        else return false;
+        return ( myC64Tools.testBit(regSR,4) );
     }
     /**
      * Break flag
      * @param val break flag
      */
     private void setFlagB(boolean val){
-        if ( val ) regSR |= 0x10;
-        else regSR &= 0xEF;
+        myC64Tools.setBit(regSR,4,val);
     }
     /**
      * Break flag
      * @return break flag
      */
     private boolean getFlagD(){
-        if ( (regSR & 0x08) == 1 ) return true;
-        else return false;
+        return ( myC64Tools.testBit(regSR,3) );
     }
     /**
      * Break flag
      * @param val break flag
      */
     private void setFlagD(boolean val){
-        if ( val ) regSR |= 0x08;
-        else regSR &= 0xF7;
+        myC64Tools.setBit(regSR,3,val);
     }
     /**
      * Interrupt flag
      * @return Interrupt flag
      */
     private boolean getFlagI(){
-        if ( (regSR & 0x04) == 1 ) return true;
-        else return false;
+        return ( myC64Tools.testBit(regSR,2) );
     }
     /**
      * Interrupt flag
      * @param val Interrupt flag
      */
     private void setFlagI(boolean val){
-        if ( val ) regSR |= 0x04;
-        else regSR &= 0xFB;
+        myC64Tools.setBit(regSR,2,val);
     }
     /**
      * Zero flag
      * @return Zero flag
      */
     private boolean getFlagZ(){
-        if ( (regSR & 0x02) == 1 ) return true;
-        else return false;
+        return ( myC64Tools.testBit(regSR,1) );
     }
     /**
      * Zero flag
      * @param val Zero flag
      */
     private void setFlagZ(boolean val){
-        if ( val ) regSR |= 0x02;
-        else regSR &= 0xFD;
+        myC64Tools.setBit(regSR,1,val);
     }
     /**
      * Carry flag
      * @return Carry flag
      */
     private boolean getFlagC(){
-        if ( (regSR & 0x01) == 1 ) return true;
-        else return false;
+        return ( myC64Tools.testBit(regSR,0) );
     }
     /**
      * Carry flag
      * @param val Carry flag
      */
     private void setFlagC(boolean val){
-        if ( val ) regSR |= 0x01;
-        else regSR &= 0xFE;
+        myC64Tools.setBit(regSR,0,val);
     }
 }
