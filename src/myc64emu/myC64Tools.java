@@ -49,8 +49,7 @@ public class myC64Tools {
     public static String byte2hex(int val){
         String outStr = "";
         outStr += "0x";
-        outStr += myC64Tools.byte2hex( (byte)(val & 0xFF) );
-        outStr += String.format("%02x", val);
+        outStr += String.format("%02x", val & 0xFF);
         return outStr;
     }
     public static boolean testBit(int reg, int pos) {

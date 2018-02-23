@@ -14,6 +14,12 @@ public class MyC64Emu {
     private myC64Memory mem = new myC64Memory();
     private myC64CPU    cpu = new myC64CPU(mem);
     
+    public void test() {
+        cpu.setRegPC(0x0000);
+        mem.writeSystemWord(cpu.getRegPC(), 0x00);
+        cpu.interpreteOP();
+        cpu.printOut();
+    }
     public static void convertBin2Data(){
         byte[] bin = myC64Tools.readBinData("basic.bin");
         myC64Tools.writeBinJavaString(bin, "basic.txt");
@@ -29,6 +35,7 @@ public class MyC64Emu {
      */
     public static void main(String[] args) {
         MyC64Emu emu = new MyC64Emu();
+        emu.test();        
     }
     
 }

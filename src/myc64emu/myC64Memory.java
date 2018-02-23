@@ -47,7 +47,7 @@ public class myC64Memory {
      * @return byte value
      */
     public int readRamByteDirect(int addr) {
-        if ( myC64Tools.isInsideAdr(0,memSize-1,addr) ){
+        if ( myC64Tools.isInsideAdr(0,getMemRamSize()-1,addr) ){
             return memRam[addr] & 0xFF;
         } else {
             return 0;
@@ -59,19 +59,19 @@ public class myC64Memory {
      * @return byte value
      */
     public int readRomByteDirect(int addr) {
-        if ( myC64Tools.isInsideAdr(0,memSize-1,addr) ){
+        if ( myC64Tools.isInsideAdr(0,getMemRomSize()-1,addr) ){
             return memRom[addr] & 0xFF;
         } else {
             return 0;
         }
     }
     public void writeRamByteDirect(int addr, int val) {
-        if ( myC64Tools.isInsideAdr(0,memSize-1,addr) ){
+        if ( myC64Tools.isInsideAdr(0,getMemRamSize()-1,addr) ){
             memRam[addr] = val & 0xFF;
         } 
     }
     public void writeRomByteDirect(int addr, int val) {
-        if ( myC64Tools.isInsideAdr(0,memSize-1,addr) ){
+        if ( myC64Tools.isInsideAdr(0,getMemRomSize()-1,addr) ){
             memRom[addr] = val & 0xFF;
         } 
     }
@@ -201,13 +201,13 @@ public class myC64Memory {
         }
     }
     public void loadRom(int addrStart, int[] Rom) {
-        for (int i = 0; i < getMemRomSize(); i++ ) {
+        for (int i = 0; i < Rom.length; i++ ) {
             writeRomByteDirect(addrStart,Rom[i]);
             addrStart++;
         }        
     }
     public void loadRam(int addrStart, int[] Ram) {
-        for (int i = 0; i < getMemRamSize(); i++ ) {
+        for (int i = 0; i < Ram.length; i++ ) {
             writeRamByteDirect(addrStart,Ram[i]);
             addrStart++;
         }        
