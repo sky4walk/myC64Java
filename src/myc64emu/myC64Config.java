@@ -30,7 +30,7 @@ public class myC64Config {
     public static int addrCharacterRomStart             = 0xD000;  
     public static int addrCharacterRomStop              = 0xDFFF;
     public static int addrVicRegisterStart              = 0xD000;  
-    public static int addrVicRegisterEnde               = 0xD02E;  
+    public static int addrVicRegisterEnde               = 0xD3FF;  
     public static int addrSidRegisterStart              = 0xD400;  
     public static int addrSidRegisterEnde               = 0xD7FF;  
     public static int addrFarbSpeicherStart             = 0xD800;  
