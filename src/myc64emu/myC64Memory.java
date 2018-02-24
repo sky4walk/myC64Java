@@ -99,40 +99,40 @@ public class myC64Memory {
     }
     public int readSystemByte(int addr){
         int retVal = 0;
-        if ( myC64Tools.isInsideAdr(
+        if ( myC64Tools.isInsideAdr( //0xD000 - 0xDFFF
                 myC64Config.addrVicRegisterStart,
-                myC64Config.addrVicRegisterEnde,
+                myC64Config.addrErweiterungenEnde,
                 addr) ) {
-            if ( myC64Pla.AdressraumValues.IO == 
+            if ( myC64Pla.AdressraumValues.CHARSETROM == 
                     pla.getAdressraum(addr) ) {
-                //retVal = VIC
-            } else if ( myC64Pla.AdressraumValues.CHARSETROM == 
+                retVal = readRomByteDirect(addr); //0xD000 - 0xDFFF
+            } else if ( myC64Pla.AdressraumValues.IO == 
                     pla.getAdressraum(addr) ) {
-                retVal = readRomByteDirect(addr);                                
-            } else {
-                retVal = readRamByteDirect(addr);                
+                if ( myC64Tools.isInsideAdr( //0xD000 - 0xD3FF
+                    myC64Config.addrVicRegisterStart,
+                    myC64Config.addrVicRegisterEnde,
+                    addr) ) {
+                        //retVal = VIC
+                } else if ( myC64Tools.isInsideAdr( //0xD400 - 0xD7FF
+                    myC64Config.addrSidRegisterStart,
+                    myC64Config.addrSidRegisterStart,
+                    addr) ) {                
+                        //retVal = SID                        
+                } else if ( myC64Tools.isInsideAdr( //0xDC00 - 0xDCFF
+                    myC64Config.addrCia1RegisterStart,
+                    myC64Config.addrCia1RegisterEnde,
+                    addr) ) {                
+                        //retVal = CIA1
+                } else if ( myC64Tools.isInsideAdr( //0xDD00 - 0xDDFF
+                    myC64Config.addrCia2RegisterStart,
+                    myC64Config.addrCia2RegisterEnde,
+                    addr) ) {
+                        //retVal = CIA1
+                } else {
+                    retVal = readRamByteDirect(addr);
+                }
             }
-        } else if ( myC64Tools.isInsideAdr(
-                myC64Config.addrCia1RegisterStart,
-                myC64Config.addrCia1RegisterEnde,
-                addr) ) {
-            if ( myC64Pla.AdressraumValues.IO == 
-                    pla.getAdressraum(addr) ) {
-                //retVal = CIA1
-            } else {
-                retVal = readRamByteDirect(addr);                               
-            }
-        } else if ( myC64Tools.isInsideAdr(
-                myC64Config.addrCia2RegisterStart,
-                myC64Config.addrCia2RegisterEnde,
-                addr) ) {
-            if ( myC64Pla.AdressraumValues.IO == 
-                    pla.getAdressraum(addr) ) {
-                //retVal = CIA2
-            } else {
-                retVal = readRamByteDirect(addr);                               
-            }
-        } else if ( myC64Tools.isInsideAdr(
+        } else if ( myC64Tools.isInsideAdr( // 0xA000 - 0xBFFF
                 myC64Config.addrBasicRomStart,
                 myC64Config.addrBasicRomEnde,
                 addr) ) {
@@ -142,7 +142,7 @@ public class myC64Memory {
             } else {
                 retVal = readRamByteDirect(addr);                               
             }
-        } else if ( myC64Tools.isInsideAdr(
+        } else if ( myC64Tools.isInsideAdr( // 0xE000 - 0xFFFF
                 myC64Config.addrKernalRomStart,
                 myC64Config.addrKernalRomEnde,
                 addr) ) {
@@ -169,6 +169,16 @@ public class myC64Memory {
         } else if ( myC64Tools.isInsideAdr(
                 myC64Config.addrVicRegisterStart,
                 myC64Config.addrVicRegisterEnde,
+                addr) ) {
+            if ( myC64Pla.AdressraumValues.IO == 
+                    pla.getAdressraum(addr) ) {
+                //write VIC
+            } else {
+                writeRamByteDirect(addr,val);
+            }
+        } else if ( myC64Tools.isInsideAdr(
+                myC64Config.addrSidRegisterStart,
+                myC64Config.addrSidRegisterEnde,
                 addr) ) {
             if ( myC64Pla.AdressraumValues.IO == 
                     pla.getAdressraum(addr) ) {

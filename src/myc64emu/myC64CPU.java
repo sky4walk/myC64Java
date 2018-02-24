@@ -308,7 +308,8 @@ public class myC64CPU {
     private void asl_err(int adr,int cycles) {
         int val = memory.readSystemByte(adr);
         memory.writeSystemByte(adr, val);
-        memory.writeSystemByte(adr, asl(val));
+        val = asl(val);
+        memory.writeSystemByte(adr, val);
         addCycleCnt(cycles);
     }
     private int asl(int val) {
