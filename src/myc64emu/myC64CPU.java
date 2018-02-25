@@ -215,11 +215,21 @@ public class myC64CPU {
         setRegSP(getRegSP()-1);
     }
     /**
-     * get the actual operation
-     * @return operation 
+     * get the actual operation 8 Bit value
+     * @return operation 8Bit value from PC
      */
     public int getActOp() {
         int val = memory.readSystemByte(getRegPC());
+        incPC();
+        return val;
+    }
+    /**
+     * get the actual operation
+     * @return return 16Bit Adresse
+     */
+    public int getActOpWord() {
+        int val = memory.readSystemWord(getRegPC());
+        incPC();
         incPC();
         return val;
     }
@@ -250,6 +260,18 @@ public class myC64CPU {
         return getActOp();
     }
     /**
+     * https://www.c64-wiki.de/wiki/Adressierung#Direkte_Adressierung
+     */
+    private int directAdr() {
+        return getActOp();
+    }
+    /**
+     * https://www.c64-wiki.de/wiki/Adressierung#Absolute_Adressierung
+     */
+    private int absoluteAdr() {
+        return getActOpWord();
+    }
+    /**
      * https://www.c64-wiki.de/wiki/Adressierung#Indirekte_X-indizierte_Zeropage-Adressierung
      * Indirekte X-indizierte Zeropage Adressierung
      */
@@ -277,6 +299,16 @@ public class myC64CPU {
                 ora(memory.readSystemByte(zeroPage()),3); break; 
             case 0x06: // ASL
                 asl_err(zeroPage(),5); break; 
+            case 0x08: // PHP https://www.c64-wiki.de/wiki/PHP
+                push(getRegSR());addCycleCnt(3);break;
+            case 0x09: // ORA https://www.c64-wiki.de/wiki/ORA_(RAUTE)$nn 
+                ora(directAdr(),2); break;
+            case 0x0A: // ASL https://www.c64-wiki.de/wiki/ASL
+                setRegA(asl(getRegA()));addCycleCnt(2);break;
+            case 0x0D: // ORA https://www.c64-wiki.de/wiki/ORA_$hhll
+                ora(memory.readSystemByte(absoluteAdr()),4);break;
+            case 0x0E:
+                asl_err(absoluteAdr(),6); break;
             default:                                
         }
     }
