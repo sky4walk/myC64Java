@@ -276,12 +276,15 @@ public class myC64CPU {
      * Indirekte X-indizierte Zeropage Adressierung
      */
     private int indirektIndiziertZero_X() {
-        return indirektIndiziertZero(getRegX());        
+        int addRZero = ( zeroPage() + getRegX() ) & 0xFF;
+        return memory.readSystemWord(addRZero);        
     }
-    private int indirektIndiziertZero(int reg) {
-        // wrap around Page
-        int addRZero = ( zeroPage() + reg ) & 0xFF;
-        return memory.readSystemWord(addRZero);
+    /**
+     * https://www.c64-wiki.de/wiki/Adressierung#Indirekte_Y-nachindizierte_Zeropage-Adressierung
+     * @return 
+     */
+    private int indirektNachindiziertZero_Y() {
+        return memory.readSystemWord( zeroPage() ) + getRegY() ;
     }
     /**
      * https://www.c64-wiki.de/wiki/Opcode
@@ -307,10 +310,23 @@ public class myC64CPU {
                 setRegA(asl(getRegA()));addCycleCnt(2);break;
             case 0x0D: // ORA https://www.c64-wiki.de/wiki/ORA_$hhll
                 ora(memory.readSystemByte(absoluteAdr()),4);break;
-            case 0x0E:
+            case 0x0E:                
                 asl_err(absoluteAdr(),6); break;
+            case 0x10: // BPL
+                bpl(); break;
+            case 0x11: // ORA
+                ora(memory.readSystemByte(indirektNachindiziertZero_Y()),5); break;
             default:                                
         }
+    }
+    /**
+     * https://www.c64-wiki.de/wiki/BPL_$hhll
+     */
+    private void bpl() {
+        int addr = getActOp() + getRegPC();
+        if ( !getFlagN() )
+            setRegPC(addr);
+        addCycleCnt(2);
     }
     /**
      * https://www.c64-wiki.de/wiki/BRK
