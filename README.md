@@ -6,3 +6,6 @@ For a deeper understanding of the C64 I always wanted to write an own C64 emulat
 
 The most information I got from  https://www.c64-wiki.de/wiki. The most influence of the SW Design comes from https://github.com/marioballano/emudore . You will find many details from this implementation in my one. I made some own changes to it according to the wiki.
 
+Compile Environment is NetBeans 8.0 (www.netbeans.org)  with integrated Java SDK 8.0
+
+c64@andrebetz.de
