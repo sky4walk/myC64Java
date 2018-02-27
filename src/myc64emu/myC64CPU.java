@@ -292,7 +292,7 @@ public class myC64CPU {
      * http://www.oxyron.de/html/opcodes02.html
      * for cycle counter
      */
-    public void interpreteOP() {
+    public boolean emulate() {
         int op = getActOp();
         switch(op) {
             case 0x00: brk(); break; // BRK                 
@@ -316,8 +316,11 @@ public class myC64CPU {
                 bpl(); break;
             case 0x11: // ORA
                 ora(memory.readSystemByte(indirektNachindiziertZero_Y()),5); break;
-            default:                                
+            default:
+                myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
+                return false;
         }
+        return true;
     }
     /**
      * https://www.c64-wiki.de/wiki/BPL_$hhll
