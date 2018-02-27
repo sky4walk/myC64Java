@@ -351,11 +351,24 @@ public class myC64CPU {
                 ora(memory.readSystemByte(absoluteIndiziertY()),4); break;
             case 0x1D: // ASL https://www.c64-wiki.de/wiki/ASL_$hhll,_X
                 aslMemRead(absoluteIndiziertY(),7); break;
+            case 0x20: // JSR
+                jsr(); break;
+            case 0x21: // AND https://www.c64-wiki.de/wiki/AND_($ll,_X)
+                and(memory.readSystemByte(indirektIndiziertZero_X()),6); break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
         }
         return true;
+    }
+    /**
+     * AND Operand
+     */
+    private void and(int val,int cycles) {
+        setRegA( getRegA() & val );
+        setFlagZ(getRegA());
+        setFlagN(getRegA());
+        addCycleCnt(cycles); 
     }
     /**
      * https://www.c64-wiki.de/wiki/BPL_$hhll
@@ -407,6 +420,16 @@ public class myC64CPU {
         setFlagZ(t);
         setFlagN(t);
         return t;
+    }
+    /**
+     * https://www.c64-wiki.de/wiki/JSR_$hhll
+     */
+    private void jsr() {
+        int adr = absoluteAdr();
+        push(myC64Tools.getLowByte(getRegPC()-1));
+        push(myC64Tools.getHighByte(getRegPC()-1));
+        setRegPC(adr);
+        addCycleCnt(6);
     }
     public void printOut() {
         String outStr = "";
