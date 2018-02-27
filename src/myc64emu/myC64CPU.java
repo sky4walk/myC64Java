@@ -5,8 +5,6 @@
 
 package myc64emu;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
-
 /**
  *
  * @author Andre Betz mail@AndreBetz.de
@@ -49,6 +47,7 @@ public class myC64CPU {
         regY  = 0;
         regSR = 0;
         regSP = 0;
+        decSP();
         regPC = memory.readSystemWord(myC64Config.addrResetVector);
         cycleCntr = 0;
     }
@@ -211,10 +210,15 @@ public class myC64CPU {
         setRegPC(1+getRegPC());
     }
     private void incSP() {
-        setRegSP(1+getRegSP());
+        // wrap around
+        setRegSP( ( getRegSP()+1 ) & 0xFF );
     }
     private void decSP() {
-        setRegSP(getRegSP()-1);
+        // wrap around
+        if ( 0 == getRegSP() )
+            setRegSP(0xFF);
+        else 
+            setRegSP(getRegSP()-1);
     }
     /**
      * get the actual operation 8 Bit value
