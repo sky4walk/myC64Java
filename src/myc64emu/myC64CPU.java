@@ -272,8 +272,9 @@ public class myC64CPU {
     /**
      * https://www.c64-wiki.de/wiki/Adressierung#Direkte_Adressierung
      * KOnstanter Wert wird direkt als Operand verwendet.
+     * direkte adressierung
      */
-    private int directAdr() {
+    private int immidiate() {
         return getActOp();
     }
     /**
@@ -330,7 +331,7 @@ public class myC64CPU {
             case 0x08: // PHP https://www.c64-wiki.de/wiki/PHP
                 push(getRegSR());addCycleCnt(3);break;
             case 0x09: // ORA https://www.c64-wiki.de/wiki/ORA_(RAUTE)$nn 
-                ora(directAdr(),2); break;
+                ora(immidiate(),2); break;
             case 0x0A: // ASL https://www.c64-wiki.de/wiki/ASL
                 setRegA(asl(getRegA()));addCycleCnt(2);break;
             case 0x0D: // ORA https://www.c64-wiki.de/wiki/ORA_$hhll
@@ -355,11 +356,65 @@ public class myC64CPU {
                 jsr(); break;
             case 0x21: // AND https://www.c64-wiki.de/wiki/AND_($ll,_X)
                 and(memory.readSystemByte(indirektIndiziertZero_X()),6); break;
+            case 0x24: // BIT 
+                bit(zeroPage(),3); break;
+            case 0x25: // AND https://www.c64-wiki.de/wiki/AND_$ll
+                and(memory.readSystemByte(zeroPage()),3);break;
+            case 0x26: // ROL https://www.c64-wiki.de/wiki/ROL_$ll
+                rolMemRead(zeroPage(),5); break;
+            case 0x28: // PLP https://www.c64-wiki.de/wiki/PLP
+                setRegSR( pop() ); addCycleCnt(4); break;
+            case 0x29: // AND https://www.c64-wiki.de/wiki/AND_$hhll
+                and(immidiate(),2); break;
+            case 0x2A: // ROL https://www.c64-wiki.de/wiki/ROL
+                setRegA( rol( getRegA() ) ); addCycleCnt(2); break;
+            case 0x2C: // BIT https://www.c64-wiki.de/wiki/BIT_$hhll
+                bit(absoluteAdr(),4); break;
+            case 0x2D: // AND https://www.c64-wiki.de/wiki/AND_$hhll
+                and(memory.readSystemByte( absoluteAdr() ),4); break;
+            case 0x2E: // ROL https://www.c64-wiki.de/wiki/ROL_$hhll
+                rolMemRead(absoluteAdr(),6); break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
         }
         return true;
+    }
+    /**
+     * special asl which have an added write command 
+     * @param adr adress
+     * @param cycles amount of cycle
+     */
+    private void rolMemRead(int adr, int cycles) {
+        int val = memory.readSystemByte(adr);
+        memory.writeSystemByte(adr, val);
+        memory.writeSystemByte(adr, rol(val));
+        addCycleCnt(cycles);
+    }
+    private int rol(int val) {
+        boolean flagC = getFlagC();
+        if ( myC64Tools.testBit(val,7) )
+            setFlagC(true);
+        else
+            setFlagC(false);
+        val = val << 1;
+        val = myC64Tools.setBit(val,0, flagC);
+        return val;
+    }
+    /**
+     * https://www.c64-wiki.de/wiki/BIT_$ll
+     * @param adr adress
+     * @param cycles amount of cycle
+     */
+    private void bit(int adr,int cycles) {
+        int val = memory.readSystemByte(adr);
+        if ( myC64Tools.testBit(val,7) )
+            setFlagV(true);
+        else
+            setFlagV(false);
+        setFlagZ(val & getRegA());
+        setFlagN(val);
+        addCycleCnt(cycles);
     }
     /**
      * AND Operand
@@ -402,6 +457,7 @@ public class myC64CPU {
         addCycleCnt(cycles);
     }
     /**
+     * special asl which have an added write command 
      * https://www.c64-wiki.de/wiki/ASL_$ll
      */
     private void aslMemRead(int adr,int cycles) {
