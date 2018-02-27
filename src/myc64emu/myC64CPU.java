@@ -5,6 +5,8 @@
 
 package myc64emu;
 
+import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
+
 /**
  *
  * @author Andre Betz mail@AndreBetz.de
@@ -260,7 +262,16 @@ public class myC64CPU {
         return getActOp();
     }
     /**
+     * https://www.c64-wiki.de/wiki/Adressierung#Zeropage_X-indizierte_Adressierung
+     * @return 
+     */
+    private int zeroXAdr() {
+        /* wrap around zero page */
+        return ( zeroPage() + getRegX() ) & 0xFF;
+    }
+    /**
      * https://www.c64-wiki.de/wiki/Adressierung#Direkte_Adressierung
+     * KOnstanter Wert wird direkt als Operand verwendet.
      */
     private int directAdr() {
         return getActOp();
@@ -270,6 +281,20 @@ public class myC64CPU {
      */
     private int absoluteAdr() {
         return getActOpWord();
+    }
+    /**
+     * https://www.c64-wiki.de/wiki/Adressierung#Absolute_Y-indizierte_Adressierung
+     * @return 
+     */
+    private int absoluteIndiziertY() {
+        return getActOpWord() + getRegY();
+    }
+    /**
+     * https://www.c64-wiki.de/wiki/Adressierung#Absolute_X-indizierte_Adressierung
+     * @return 
+     */
+    private int absoluteIndiziertX() {
+        return getActOpWord() + getRegX();
     }
     /**
      * https://www.c64-wiki.de/wiki/Adressierung#Indirekte_X-indizierte_Zeropage-Adressierung
@@ -301,7 +326,7 @@ public class myC64CPU {
             case 0x05: // ORA
                 ora(memory.readSystemByte(zeroPage()),3); break; 
             case 0x06: // ASL
-                asl_err(zeroPage(),5); break; 
+                aslMemRead(zeroPage(),5); break; 
             case 0x08: // PHP https://www.c64-wiki.de/wiki/PHP
                 push(getRegSR());addCycleCnt(3);break;
             case 0x09: // ORA https://www.c64-wiki.de/wiki/ORA_(RAUTE)$nn 
@@ -311,11 +336,21 @@ public class myC64CPU {
             case 0x0D: // ORA https://www.c64-wiki.de/wiki/ORA_$hhll
                 ora(memory.readSystemByte(absoluteAdr()),4);break;
             case 0x0E:                
-                asl_err(absoluteAdr(),6); break;
+                aslMemRead(absoluteAdr(),6); break;
             case 0x10: // BPL
                 bpl(); break;
             case 0x11: // ORA
                 ora(memory.readSystemByte(indirektNachindiziertZero_Y()),5); break;
+            case 0x15: // ORA
+                ora(memory.readSystemByte(zeroXAdr()),4); break;
+            case 0x16: // ASL https://www.c64-wiki.de/wiki/ASL_$ll,_X
+                aslMemRead(zeroXAdr(),6); break;
+            case 0x18: // CLC https://www.c64-wiki.de/wiki/CLC
+                setFlagC(false);addCycleCnt(2);break;
+            case 0x19: // ORA https://www.c64-wiki.de/wiki/ORA_$hhll,_Y
+                ora(memory.readSystemByte(absoluteIndiziertY()),4); break;
+            case 0x1D: // ASL https://www.c64-wiki.de/wiki/ASL_$hhll,_X
+                aslMemRead(absoluteIndiziertY(),7); break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
@@ -356,7 +391,7 @@ public class myC64CPU {
     /**
      * https://www.c64-wiki.de/wiki/ASL_$ll
      */
-    private void asl_err(int adr,int cycles) {
+    private void aslMemRead(int adr,int cycles) {
         int val = memory.readSystemByte(adr);
         memory.writeSystemByte(adr, val);
         val = asl(val);
