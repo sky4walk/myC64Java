@@ -340,7 +340,7 @@ public class myC64CPU {
                 setRegA(asl(getRegA()));addCycleCnt(2);break;
             case 0x0D: // ORA https://www.c64-wiki.de/wiki/ORA_$hhll
                 ora(memory.readSystemByte(absoluteAdr()),4);break;
-            case 0x0E:                
+            case 0x0E: // ASL          
                 aslMemRead(absoluteAdr(),6); break;
             case 0x10: // BPL
                 bpl(); break;
@@ -380,6 +380,20 @@ public class myC64CPU {
                 rolMemRead(absoluteAdr(),6); break;
             case 0x30: // BMI https://www.c64-wiki.de/wiki/BMI_$hhll
                 bmi(); break;
+            case 0x31: // AND https://www.c64-wiki.de/wiki/AND_($ll),_Y
+                and(memory.readSystemByte(indirektNachindiziertZero_Y()),3);break;
+            case 0x35: // AND https://www.c64-wiki.de/wiki/AND_$ll,_X
+                and(memory.readSystemByte(zeroXAdr()),4); break;
+            case 0x36: // ROL https://www.c64-wiki.de/wiki/ROL_$ll,_X
+                rolMemRead(memory.readSystemByte(zeroXAdr()), 6); break;
+            case 0x38: // SEC https://www.c64-wiki.de/wiki/SEC
+                setFlagC(true); addCycleCnt(2); break;
+            case 0x39: // AND https://www.c64-wiki.de/wiki/AND_$hhll,_X
+                and(memory.readSystemByte(absoluteIndiziertY()),4); break;
+            case 0x3D: // AND https://www.c64-wiki.de/wiki/AND_$hhll,_X
+                and(memory.readSystemByte(absoluteIndiziertX()),4); break;                
+            case 0x3E: // AND https://www.c64-wiki.de/wiki/AND_$hhll,_X
+                rolMemRead(memory.readSystemByte(absoluteIndiziertX()),7); break;                
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
