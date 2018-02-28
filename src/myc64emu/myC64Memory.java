@@ -21,9 +21,12 @@ public class myC64Memory {
     public myC64Memory() {
         memRam = new int[memSize];
         memRom = new int[memSize];
-        loadRom(myC64Config.addrBasicRomStart,    myC64RomBasic.mem);
-        loadRom(myC64Config.addrCharacterRomStart,myC64RomCharacters.mem);
-        loadRom(myC64Config.addrKernalRomStart,   myC64RomKernal.mem);
+        loadRom(myC64Config.addrBasicRomStart,    
+                myC64RomBasic.mem, myC64Config.byteConvert);
+        loadRom(myC64Config.addrCharacterRomStart,
+                myC64RomCharacters.mem, myC64Config.byteConvert);
+        loadRom(myC64Config.addrKernalRomStart,   
+                myC64RomKernal.mem, myC64Config.byteConvert);
         reset();
     }
     public void reset() {
@@ -210,9 +213,9 @@ public class myC64Memory {
             writeRamByteDirect(addr,val);
         }
     }
-    public void loadRom(int addrStart, int[] Rom) {
+    public void loadRom(int addrStart, int[] Rom, int add) {
         for (int i = 0; i < Rom.length; i++ ) {
-            writeRomByteDirect(addrStart,Rom[i]);
+            writeRomByteDirect(addrStart,myC64Tools.subByte(Rom[i], add));
             addrStart++;
         }        
     }
@@ -227,7 +230,7 @@ public class myC64Memory {
             String outStr = "";
             int val = readSystemByte(i);
             outStr += "0x";
-            outStr += myC64Tools.byte2hex( (byte)(val & 0xFF) );
+            outStr += myC64Tools.byte2hex( (byte)(val & 0xFF),0 );
             outStr += " ";
             if ( i > 0 && (i % 10)==0 )
                 outStr += "\n";

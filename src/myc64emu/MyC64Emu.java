@@ -50,13 +50,13 @@ public class MyC64Emu {
     }
     public static void convertBin2Data(){
         byte[] bin = myC64Tools.readBinData("basic.bin");
-        myC64Tools.writeBinJavaString(bin, "basic.txt");
+        myC64Tools.writeBinJavaString(bin, "basic.txt",0);
         
         bin = myC64Tools.readBinData("characters.bin");
-        myC64Tools.writeBinJavaString(bin, "char.txt");
+        myC64Tools.writeBinJavaString(bin, "char.txt",0);
         
         bin = myC64Tools.readBinData("kernal.bin");
-        myC64Tools.writeBinJavaString(bin, "kernal.txt");
+        myC64Tools.writeBinJavaString(bin, "kernal.txt",0);
     }
     /**
      * @param args the command line arguments

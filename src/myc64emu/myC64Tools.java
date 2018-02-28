@@ -28,7 +28,7 @@ public class myC64Tools {
 	}        
         return allBytes;
     }
-    public static void writeBinJavaString(byte[] binData, String filePath){
+    public static void writeBinJavaString(byte[] binData, String filePath, int add){
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(filePath));
             for ( int i = 0; i < binData.length; i++ ){
@@ -39,17 +39,17 @@ public class myC64Tools {
                         outStr += "\n";
                     }
                 }
-                outStr += byte2hex(binData[i]);
+                outStr += byte2hex(binData[i],add);
                 out.write(outStr);
             }
             out.flush();
         } catch (IOException ex) {
         } 
-    }        
-    public static String byte2hex(int val){
+    }    
+    public static String byte2hex(int val, int add){
         String outStr = "";
         outStr += "0x";
-        outStr += String.format("%02x", val & 0xFF);
+        outStr += String.format("%02x", addByte(val,add));
         return outStr;
     }
     public static boolean testBit(int reg, int pos) {
@@ -89,5 +89,22 @@ public class myC64Tools {
             return true;
         }
         return false;
+    }
+    /**
+     * add two Byte parameters with wrap around.
+     * @param val1 one byte.
+     * @param val2 second byte.
+     * @return added val1 + val2 with wrap around.
+     */
+    public static int addByte( int val1, int val2 ) {
+        return ( (val1 & 0xFF) + (val2 & 0xFF) ) & 0xFF;
+    }
+    /** subtract two Byte parameters with wrap around.
+     * @param val1 one byte.
+     * @param val2 second byte.
+     * @return added val1 - val2 with wrap around.
+     */ 
+    public static int subByte( int val1, int val2 ) {
+        return addByte( val1, ( 0xFF - (val2 & 0xFF) + 1) );
     }
 }

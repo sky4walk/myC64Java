@@ -50,4 +50,6 @@ public class myC64Config {
     public static int addrNMIVector                     = 0xFFFA;
     public static int addrResetVector                   = 0xFFFC;
     public static int addrIRQVector                     = 0xFFFE;
+    
+    public static int byteConvert                       = 0x13;
 }

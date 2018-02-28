@@ -531,17 +531,17 @@ public class myC64CPU {
     public void printOut() {
         String outStr = "";
         outStr += "regA: ";
-        outStr += myC64Tools.byte2hex(getRegA());
+        outStr += myC64Tools.byte2hex(getRegA(),0);
         outStr += "\nregX: ";
-        outStr += myC64Tools.byte2hex(getRegX());
+        outStr += myC64Tools.byte2hex(getRegX(),0);
         outStr += "\nregY: ";
-        outStr += myC64Tools.byte2hex(getRegY());
+        outStr += myC64Tools.byte2hex(getRegY(),0);
         outStr += "\nregSR: ";
-        outStr += myC64Tools.byte2hex(getRegSR());
+        outStr += myC64Tools.byte2hex(getRegSR(),0);
         outStr += "\nregSP: ";
-        outStr += myC64Tools.byte2hex(getRegSP());
+        outStr += myC64Tools.byte2hex(getRegSP(),0);
         outStr += "\nregPC: ";
-        outStr += myC64Tools.byte2hex(getRegPC());
+        outStr += myC64Tools.byte2hex(getRegPC(),0);
         outStr += "\ncycles: ";
         outStr += Integer.toString(getCycles());        
         outStr += "\n";
