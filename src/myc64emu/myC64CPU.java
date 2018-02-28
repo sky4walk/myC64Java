@@ -55,7 +55,7 @@ public class myC64CPU {
         return cycleCntr;
     }
     public int getRegPC() {
-        return regPC;
+        return regPC & 0xFFFF;
     }
     /**
      * set the Program counter
@@ -63,37 +63,37 @@ public class myC64CPU {
      * @param reg 
      */
     public void setRegPC(int reg) {
-        regPC = reg;
+        regPC = reg & 0xFFFF;
     }
     public int getRegSR() {
-        return regSR;
+        return regSR & 0xFF;
     }
     private void setRegSR(int reg) {
-        regSR = reg;
+        regSR = reg & 0xFF;
     }
     public int getRegSP() {
-        return regSP;
+        return regSP & 0xFF;
     }
     private void setRegSP(int reg) {
-        regSP = reg;
+        regSP = reg & 0xFF;
     }
     public int getRegA() {
-        return regA;
+        return regA & 0xFF;
     }
     public void setRegA(int reg) {
-        regA = reg;
+        regA = reg & 0xFF;
     }
     public int getRegX() {
-        return regX;
+        return regX & 0xFF;
     }
     public void setRegX(int reg) {
-        regX = reg;
+        regX = reg & 0xFF;
     }
     public int getRegY() {
-        return regY;
+        return regY & 0xFF;
     }
     public void setRegY(int reg) {
-        regY = reg;
+        regY = reg & 0xFF;
     }
     /**
      * zaehlt die cycles.
@@ -207,18 +207,18 @@ public class myC64CPU {
         setRegSR(myC64Tools.setBit(regSR,0,val));
     }
     private void incPC() {
-        setRegPC(1+getRegPC());
+        setRegPC( getRegPC()+1 );
     }
     private void incSP() {
         // wrap around
-        setRegSP( ( getRegSP()+1 ) & 0xFF );
+        setRegSP( getRegSP()+1 );
     }
     private void decSP() {
         // wrap around
         if ( 0 == getRegSP() )
-            setRegSP(0xFF);
+            setRegSP( 0xFF );
         else 
-            setRegSP(getRegSP()-1);
+            setRegSP( getRegSP()-1 );
     }
     /**
      * get the actual operation 8 Bit value
@@ -378,12 +378,14 @@ public class myC64CPU {
                 and(memory.readSystemByte( absoluteAdr() ),4); break;
             case 0x2E: // ROL https://www.c64-wiki.de/wiki/ROL_$hhll
                 rolMemRead(absoluteAdr(),6); break;
+            case 0x30: // BMI https://www.c64-wiki.de/wiki/BMI_$hhll
+                bmi(); break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
         }
         return true;
-    }
+    }    
     /**
      * special asl which have an added write command 
      * @param adr adress
@@ -430,13 +432,34 @@ public class myC64CPU {
         addCycleCnt(cycles); 
     }
     /**
+     * http://www.6502.org/tutorials/6502opcodes.html#PC
+     * http://www.6502.org/tutorials/6502opcodes.html#BMI
+     * https://www.c64-wiki.de/wiki/BMI_$hhll
+     */
+    private void bmi() {
+        int adrAdd = getActOp();
+        addCycleCnt(2);
+        if ( getFlagN() ) {
+            addCycleCnt(1);
+            // jump over page needs extra cycle
+            if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
+                addCycleCnt(1);
+            setRegPC( getRegPC() + adrAdd );
+        }
+    }
+    /**
      * https://www.c64-wiki.de/wiki/BPL_$hhll
      */
     private void bpl() {
-        int addr = getActOp() + getRegPC();
-        if ( !getFlagN() )
-            setRegPC(addr);
+        int adrAdd = getActOp();
         addCycleCnt(2);
+        if ( !getFlagN() ) {
+            addCycleCnt(1);
+            // jump over page needs extra cycle
+            if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
+                addCycleCnt(1);
+            setRegPC( getRegPC() + adrAdd );
+        }       
     }
     /**
      * https://www.c64-wiki.de/wiki/BRK

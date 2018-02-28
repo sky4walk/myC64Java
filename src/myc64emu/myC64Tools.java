@@ -82,4 +82,12 @@ public class myC64Tools {
     public static void printOut(String text) {
         System.out.println(text);
     }
+    public static boolean pageJumpAdd(int adrBase,int adrAdd) {
+        int newAdr = (adrBase & 0xFFFF) + (adrAdd & 0xFFFF);
+        if ( getHighByte(adrBase & 0xFFFF) !=
+             getHighByte(newAdr & 0xFFFF) ) {
+            return true;
+        }
+        return false;
+    }
 }

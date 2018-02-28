@@ -155,7 +155,7 @@ public class myC64Memory {
         } else {
             retVal = readRamByteDirect(addr);
         }
-        return retVal;
+        return retVal & 0xFF;
     }
     public void writeSystemByte(int addr, int val){
         if ( myC64Tools.isInsideAdr(
