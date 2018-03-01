@@ -13,7 +13,7 @@ public class myC64CPU {
     /**
      * memory 64KB
      */
-    private myC64Memory memory;
+    private final myC64Memory memory;
     /**
      * Akkumulator Register 8Bit
      */
@@ -393,13 +393,63 @@ public class myC64CPU {
             case 0x3D: // AND https://www.c64-wiki.de/wiki/AND_$hhll,_X
                 and(memory.readSystemByte(absoluteIndiziertX()),4); break;                
             case 0x3E: // AND https://www.c64-wiki.de/wiki/AND_$hhll,_X
-                rolMemRead(memory.readSystemByte(absoluteIndiziertX()),7); break;                
+                rolMemRead(memory.readSystemByte(absoluteIndiziertX()),7); break;
+            case 0x40: // RTI
+                rti(); break;
+            case 0x41: // EOR https://www.c64-wiki.de/wiki/EOR_($ll,_X)
+                eor(memory.readSystemByte(indirektIndiziertZero_X()),6); break;
+            case 0x45: // EOR memory.readSystemByte(zeroPage()),3
+                eor(memory.readSystemByte(zeroPage()),3); break;
+            case 0x46: // LSR https://www.c64-wiki.de/wiki/LSR_$ll
+                lsrMemRead(zeroPage(), 5); break;
+            case 0x48: // PHA 
+                push(getRegA());addCycleCnt(3);break;
+            case 0x49: // EOR
+                eor(getActOp(),2); break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
         }
         return true;
-    }    
+    }
+    /**
+     * special lri which have an added write command 
+     * @param adr adress
+     * @param cycles amount of cycle
+     */
+    private void lsrMemRead(int adr, int cycles) {
+        int val = memory.readSystemByte(adr);
+        memory.writeSystemByte(adr, val);
+        memory.writeSystemByte(adr, lsr(val));
+        addCycleCnt(cycles);
+    }
+    /**
+     * http://www.6502.org/tutorials/6502opcodes.html#LSR
+     * @param val
+     * @return 
+     */
+    private int lsr(int val) {
+        if ( myC64Tools.testBit(val,0) )
+            setFlagC(true);
+        else
+            setFlagC(false);
+        val = val >> 1;
+        val = myC64Tools.setBit(val,0, false);
+        setFlagZ(val);
+        setFlagN(val);
+        return val;
+    }
+    /**
+     * EOR
+     * exclusive oder
+     * http://www.6502.org/tutorials/6502opcodes.html#EOR
+     */
+    private void eor(int val,int cycles) {
+        setRegA( getRegA() ^ val );
+        setFlagZ(getRegA());
+        setFlagN(getRegA());
+        addCycleCnt(cycles); 
+    }
     /**
      * special asl which have an added write command 
      * @param adr adress
@@ -411,6 +461,11 @@ public class myC64CPU {
         memory.writeSystemByte(adr, rol(val));
         addCycleCnt(cycles);
     }
+    /**
+     * http://www.6502.org/tutorials/6502opcodes.html#ROL
+     * @param val value
+     * @return 
+     */
     private int rol(int val) {
         boolean flagC = getFlagC();
         if ( myC64Tools.testBit(val,7) )
@@ -419,6 +474,8 @@ public class myC64CPU {
             setFlagC(false);
         val = val << 1;
         val = myC64Tools.setBit(val,0, flagC);
+        setFlagZ(val);
+        setFlagN(val);
         return val;
     }
     /**
@@ -488,6 +545,17 @@ public class myC64CPU {
         setRegPC(memory.readSystemWord(myC64Config.addrIRQVector));
         addCycleCnt(7);
     }
+    /**
+     * https://www.c64-wiki.de/wiki/RTI
+     */
+    public void rti() {
+        setRegSR( pop() );
+        int lowByte  = pop();
+        int highByte = pop();
+        setRegPC(myC64Tools.getWord(lowByte,highByte));
+        addCycleCnt(6);
+    }
+
     /**
      * https://www.c64-wiki.de/wiki/ORA_($ll,_X)
      */
