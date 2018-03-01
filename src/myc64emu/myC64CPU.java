@@ -406,6 +406,14 @@ public class myC64CPU {
                 push(getRegA());addCycleCnt(3);break;
             case 0x49: // EOR
                 eor(getActOp(),2); break;
+            case 0x4A: // LSR https://www.c64-wiki.de/wiki/Opcode
+                setRegA( lsr( getRegA())); addCycleCnt(2); break;
+            case 0x4C: // JMP https://www.c64-wiki.de/wiki/JMP_$hhll
+                setRegPC(absoluteAdr()); addCycleCnt(3); break;
+            case 0x4D: // EOR https://www.c64-wiki.de/wiki/JMP_$hhll
+                eor(memory.readSystemByte(absoluteAdr()),4); break;
+            case 0x4E: // LSR https://www.c64-wiki.de/wiki/LSR_$hhll
+                lsrMemRead(absoluteAdr(), 6); break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
