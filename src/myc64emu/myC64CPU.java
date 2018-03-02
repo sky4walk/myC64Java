@@ -414,6 +414,22 @@ public class myC64CPU {
                 eor(memory.readSystemByte(absoluteAdr()),4); break;
             case 0x4E: // LSR https://www.c64-wiki.de/wiki/LSR_$hhll
                 lsrMemRead(absoluteAdr(), 6); break;
+            case 0x50: // BVC https://www.c64-wiki.de/wiki/BVC_$hhll
+                bvc(); break;
+            case 0x51: // EOR https://www.c64-wiki.de/wiki/EOR_($ll),_Y
+                eor(memory.readSystemByte(indirektNachindiziertZero_Y()),5);break;
+            case 0x55: // EOR https://www.c64-wiki.de/wiki/EOR_$ll,_X                
+                eor(memory.readSystemByte(zeroXAdr()),4); break;
+            case 0x56: // LSR https://www.c64-wiki.de/wiki/LSR_$ll,_X
+                lsrMemRead(zeroXAdr(), 6); break;
+            case 0x58: // CLI https://www.c64-wiki.de/wiki/CLI
+                setFlagI(false); addCycleCnt(2); break;
+            case 0x59: // EOR 
+                eor(memory.readSystemByte(absoluteIndiziertY()),4); break;
+            case 0x5D: // EOR https://www.c64-wiki.de/wiki/EOR_$hhll,_X
+                eor(memory.readSystemByte(absoluteIndiziertX()),4); break;
+            case 0x5E: // LSR https://www.c64-wiki.de/wiki/LSR_$hhll,_X
+                lsrMemRead(absoluteIndiziertX(), 7); break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
@@ -539,6 +555,20 @@ public class myC64CPU {
                 addCycleCnt(1);
             setRegPC( getRegPC() + adrAdd );
         }       
+    }
+    /**
+     * http://www.6502.org/tutorials/6502opcodes.html#BVC
+     */
+    private void bvc() {
+        int adrAdd = getActOp();
+        addCycleCnt(2);
+        if ( !getFlagV()) {
+            addCycleCnt(1);
+            // jump over page needs extra cycle
+            if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
+                addCycleCnt(1);
+            setRegPC( getRegPC() + adrAdd );
+        }               
     }
     /**
      * https://www.c64-wiki.de/wiki/BRK
