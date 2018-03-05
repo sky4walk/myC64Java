@@ -107,4 +107,13 @@ public class myC64Tools {
     public static int subByte( int val1, int val2 ) {
         return addByte( val1, ( 0xFF - (val2 & 0xFF) + 1) );
     }
+    /**
+     * XOR operator
+     * @param val1
+     * @param val2
+     * @return val1 xor val2
+     */
+    public static int xor( int val1, int val2 ) {
+        return val1 ^ val2;
+    }
 }

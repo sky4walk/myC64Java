@@ -12,6 +12,7 @@ public class myC64PrgCpuTest {
     /**
      * CPU Test program from
      * https://github.com/Klaus2m5/6502_65C02_functional_tests
+     * http://visual6502.org/wiki/index.php?title=6502TestPrograms
      */
     public static int[] getMem1() {        
         int mem[] = {

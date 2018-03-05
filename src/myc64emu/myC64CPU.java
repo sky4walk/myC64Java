@@ -54,6 +54,10 @@ public class myC64CPU {
     public int getCycles() {
         return cycleCntr;
     }
+    /**
+     * Program Counter
+     * @return 
+     */
     public int getRegPC() {
         return regPC & 0xFFFF;
     }
@@ -65,30 +69,51 @@ public class myC64CPU {
     public void setRegPC(int reg) {
         regPC = reg & 0xFFFF;
     }
+    /**
+     * Status Register 
+     * enthaelt Flags
+     * @return 
+     */
     public int getRegSR() {
         return regSR & 0xFF;
     }
     private void setRegSR(int reg) {
         regSR = reg & 0xFF;
     }
+    /**
+     * Stack Pointer
+     * @return 
+     */
     public int getRegSP() {
         return regSP & 0xFF;
     }
     private void setRegSP(int reg) {
         regSP = reg & 0xFF;
     }
+    /**
+     * Akkumulator 
+     * @return 
+     */
     public int getRegA() {
         return regA & 0xFF;
     }
     public void setRegA(int reg) {
         regA = reg & 0xFF;
     }
+    /**
+     * Register X
+     * @return 
+     */
     public int getRegX() {
         return regX & 0xFF;
     }
     public void setRegX(int reg) {
         regX = reg & 0xFF;
     }
+    /**
+     * Register Y
+     * @return 
+     */
     public int getRegY() {
         return regY & 0xFF;
     }
@@ -148,14 +173,14 @@ public class myC64CPU {
         setRegSR(myC64Tools.setBit(getRegSR(),4,val));
     }
     /**
-     * Break flag
+     * Dezimal flag
      * @return break flag
      */
     private boolean getFlagD(){
         return ( myC64Tools.testBit(getRegSR(),3) );
     }
     /**
-     * Break flag
+     * Dezimal flag
      * @param val break flag
      */
     private void setFlagD(boolean val){
@@ -206,13 +231,22 @@ public class myC64CPU {
     private void setFlagC(boolean val){
         setRegSR(myC64Tools.setBit(regSR,0,val));
     }
+    /**
+     * erhoeht Program Counter Flag
+     */
     private void incPC() {
         setRegPC( getRegPC()+1 );
     }
+    /**
+     * erhoeht StackPointer
+     */
     private void incSP() {
         // wrap around
         setRegSP( getRegSP()+1 );
     }
+    /**
+     * erniedrigt StackPointer
+     */
     private void decSP() {
         // wrap around
         if ( 0 == getRegSP() )
@@ -398,7 +432,7 @@ public class myC64CPU {
                 rti(); break;
             case 0x41: // EOR https://www.c64-wiki.de/wiki/EOR_($ll,_X)
                 eor(memory.readSystemByte(indirektIndiziertZero_X()),6); break;
-            case 0x45: // EOR memory.readSystemByte(zeroPage()),3
+            case 0x45: // EOR https://www.c64-wiki.de/wiki/EOR_$ll
                 eor(memory.readSystemByte(zeroPage()),3); break;
             case 0x46: // LSR https://www.c64-wiki.de/wiki/LSR_$ll
                 lsrMemRead(zeroPage(), 5); break;
@@ -430,11 +464,73 @@ public class myC64CPU {
                 eor(memory.readSystemByte(absoluteIndiziertX()),4); break;
             case 0x5E: // LSR https://www.c64-wiki.de/wiki/LSR_$hhll,_X
                 lsrMemRead(absoluteIndiziertX(), 7); break;
+            case 0x60: // RTS https://www.c64-wiki.de/wiki/RTS
+                rts();break;
+            case 0x61: // ADC https://www.c64-wiki.de/wiki/ADC_($ll,_X)
+                adc(memory.readSystemByte(indirektIndiziertZero_X()),6);break;
+            case 0x65: // ADC https://www.c64-wiki.de/wiki/ADC
+                adc(memory.readSystemByte(zeroPage()),5);break;
+            case 0x66: // ROR https://www.c64-wiki.de/wiki/ROR_$ll
+                rorMemRead(zeroPage(),5); break;
+            case 0x68: // PLA https://www.c64-wiki.de/wiki/PLA
+                pla(); break;
+            case 0x69: // ADC https://www.c64-wiki.de/wiki/ADC_(RAUTE)$nn
+                adc(getActOp(),2); break;
+            case 0x6A: // ROR 
+                setRegA(ror(getRegA()));addCycleCnt(2);break;
+            case 0x6C: // JMP 
+                setRegPC(memory.readSystemWord(absoluteAdr()));addCycleCnt(3);break;                
+            case 0x6D: // ADC
+                adc(memory.readSystemByte(absoluteAdr()),4);break;
+            case 0x6E: // ROR
+                rorMemRead(absoluteAdr(), 6); break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
         }
         return true;
+    }
+    /**
+     * PLA
+     * https://www.c64-wiki.de/wiki/PLA
+     */
+    private void pla() {
+        setRegA(pop());
+        setFlagZ(getRegA());
+        setFlagN(getRegA());
+        addCycleCnt(4);
+    }
+    /**
+     * ADC 
+     * @param adr adress
+     * @param cycles amount of cycle
+     */
+    private void adc(int val, int cycles) {
+        int res = getRegA() + val + ( getFlagC() ? 1 : 0);
+        if ( getFlagD() ) {
+            // BCD codiert https://de.wikipedia.org/wiki/BCD-Code
+            int xorAdd = myC64Tools.xor(myC64Tools.xor(getRegA(),val ),res);
+            if ( (xorAdd & 0x10) == 0x10) 
+                res += 0x06;
+            if ((res & 0xF0) > 0x90)
+                res += 0x60;
+        } 
+        if ( res > 0xFF )
+            setFlagC(true);
+        else
+            setFlagC(false);
+        res &= 0xFF;
+        // https://www.c64-wiki.de/wiki/Statusregister#Overflow-Flag
+        // https://stackoverflow.com/questions/29193303/6502-emulation-proper-way-to-implement-adc-and-sbc
+        if ( !myC64Tools.testBit(myC64Tools.xor(getRegA(),val ),7 ) && 
+              myC64Tools.testBit(myC64Tools.xor(getRegA(),res ),7 ) ) {
+            setFlagV(true);
+        } else {
+            setFlagV(true);
+        }
+        setFlagZ(res);
+        setFlagN(res);
+        setRegA(res);
     }
     /**
      * special lri which have an added write command 
@@ -469,10 +565,38 @@ public class myC64CPU {
      * http://www.6502.org/tutorials/6502opcodes.html#EOR
      */
     private void eor(int val,int cycles) {
-        setRegA( getRegA() ^ val );
+        setRegA( myC64Tools.xor(getRegA(),val ) );
         setFlagZ(getRegA());
         setFlagN(getRegA());
         addCycleCnt(cycles); 
+    }
+    /**
+     * special asl which have an added write command 
+     * @param adr adress
+     * @param cycles amount of cycle
+     */
+    private void rorMemRead(int adr, int cycles) {
+        int val = memory.readSystemByte(adr);
+        memory.writeSystemByte(adr, val);
+        memory.writeSystemByte(adr, ror(val));
+        addCycleCnt(cycles);
+    }
+    /**
+     * http://www.6502.org/tutorials/6502opcodes.html#ROR
+     * @param val value
+     * @return 
+     */
+    private int ror(int val) {
+        boolean flagC = getFlagC();
+        if ( myC64Tools.testBit(val,0) )
+            setFlagC(true);
+        else
+            setFlagC(false);
+        val = val >> 1;
+        val = myC64Tools.setBit(val,7, flagC);
+        setFlagZ(val);
+        setFlagN(val);
+        return val;
     }
     /**
      * special asl which have an added write command 
@@ -593,8 +717,19 @@ public class myC64CPU {
         setRegPC(myC64Tools.getWord(lowByte,highByte));
         addCycleCnt(6);
     }
-
     /**
+     * https://www.c64-wiki.de/wiki/RTS
+     */
+    public void rts() {
+        int lowByte = pop();
+        int highByte = pop();
+        int adr = myC64Tools.getWord(lowByte,highByte);
+        setRegPC(adr);
+        incPC();
+        addCycleCnt(6);
+    }
+    /**
+     *
      * https://www.c64-wiki.de/wiki/ORA_($ll,_X)
      */
     private void ora(int val,int cycles) {
