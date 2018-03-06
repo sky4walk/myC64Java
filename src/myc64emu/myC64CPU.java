@@ -500,11 +500,70 @@ public class myC64CPU {
                 adc(absoluteIndiziertX(),4); break;
             case 0x7E: // ROR https://www.c64-wiki.de/wiki/ROR_$hhll,_X
                 rorMemRead(absoluteIndiziertX(), 7); break;
+            case 0x81: // STA https://www.c64-wiki.de/wiki/STA_($ll,_X)
+                sta(indirektIndiziertZero_X(),6); break;
+            case 0x84: // STY https://www.c64-wiki.de/wiki/STY_$ll
+                sty(zeroPage(),3);break;
+            case 0x85: // STA https://www.c64-wiki.de/wiki/STY_$ll
+                sta(zeroPage(),3);break;
+            case 0x86: // STA https://www.c64-wiki.de/wiki/STX_$ll
+                stx(zeroPage(),3);break;
+            case 0x88: // DEY https://www.c64-wiki.de/wiki/DEY
+                dey(); break;
+            case 0x8A: // TXA https://www.c64-wiki.de/wiki/TXA
+                txa();break;
+            case 0x8C: // STY https://www.c64-wiki.de/wiki/STY_$hhll
+                sty(absoluteAdr(),4);break;
+            case 0x8D: // STY https://www.c64-wiki.de/wiki/STA_$hhll
+                sta(absoluteAdr(),4);break;
+            case 0x8E: // STY https://www.c64-wiki.de/wiki/STX_$hhll
+                sta(absoluteAdr(),4);break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
         }
         return true;
+    }
+    /**
+     * TXA
+     */
+    private void txa() {
+        setRegA(getRegX());
+        setFlagZ(getRegA());
+        setFlagN(getRegA());
+        addCycleCnt(2);
+    }
+    /**
+     * DEY
+     */
+    private void dey() {
+        // wrap around
+        if ( 0 == getRegY() )
+            setRegY( 0xFF );
+        else 
+            setRegY( getRegSP()-1 );
+        addCycleCnt(2);
+    }
+    /**
+     * STA 
+     */
+    private void sta(int val, int cycles){
+        memory.writeSystemByte(val, getRegA());
+        addCycleCnt(cycles);
+    }
+    /**
+     * STX
+     */
+    private void stx(int val, int cycles){
+        memory.writeSystemByte(val, getRegX());
+        addCycleCnt(cycles);
+    }
+    /**
+     * STY
+     */
+    private void sty(int val, int cycles){
+        memory.writeSystemByte(val, getRegY());
+        addCycleCnt(cycles);
     }
     /**
      * PLA
