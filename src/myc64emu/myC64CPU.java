@@ -308,6 +308,14 @@ public class myC64CPU {
         return ( zeroPage() + getRegX() ) & 0xFF;
     }
     /**
+     * https://www.c64-wiki.de/wiki/Adressierung#Zeropage_Y-indizierte_Adressierung
+     * @return 
+     */
+    private int zeroYAdr() {
+        /* wrap around zero page */
+        return ( zeroPage() + getRegY() ) & 0xFF;
+    }
+    /**
      * https://www.c64-wiki.de/wiki/Adressierung#Direkte_Adressierung
      * KOnstanter Wert wird direkt als Operand verwendet.
      * direkte adressierung
@@ -518,11 +526,38 @@ public class myC64CPU {
                 sta(absoluteAdr(),4);break;
             case 0x8E: // STY https://www.c64-wiki.de/wiki/STX_$hhll
                 sta(absoluteAdr(),4);break;
+            case 0x90: // BCC https://www.c64-wiki.de/wiki/BCC_$hhll
+                bcc(); break;
+            case 0x91: // STA https://www.c64-wiki.de/wiki/STA_($ll),_Y
+                sta(indirektNachindiziertZero_Y(),6);break;
+            case 0x94: // STY https://www.c64-wiki.de/wiki/STY_$ll,_X
+                sty(zeroXAdr(),4); break;
+            case 0x95: // STA https://www.c64-wiki.de/wiki/STA_$ll,_X
+                sta(zeroXAdr(),4);break;
+            case 0x96: // STX https://www.c64-wiki.de/wiki/STX_$ll,_Y
+                stx(zeroYAdr(),4);break;
+            case 0x98: // TYA https://www.c64-wiki.de/wiki/TYA
+                tya();break;
+            case 0x99: // STA https://www.c64-wiki.de/wiki/STA_$hhll,_Y
+                sta(absoluteIndiziertY(),5);break;
+            case 0x9A: // TXS https://www.c64-wiki.de/wiki/TXS
+                setRegSP(getRegX());addCycleCnt(2);break;
+            case 0x9D: // STA https://www.c64-wiki.de/wiki/STA_$hhll,_X
+                sta(absoluteIndiziertX(),5);break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
         }
         return true;
+    }
+    /**
+     * TYA
+     */
+    private void tya() {
+        setRegA(getRegY());
+        setFlagZ(getRegA());
+        setFlagN(getRegA());
+        addCycleCnt(2);
     }
     /**
      * TXA
@@ -740,6 +775,20 @@ public class myC64CPU {
                 addCycleCnt(1);
             setRegPC( getRegPC() + adrAdd );
         }
+    }
+    /**
+     * https://www.c64-wiki.de/wiki/BCC_$hhll
+     */
+    private void bcc() {
+        int adrAdd = getActOp();
+        addCycleCnt(2);
+        if ( !getFlagC() ) {
+            addCycleCnt(1);
+            // jump over page needs extra cycle
+            if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
+                addCycleCnt(1);
+            setRegPC( getRegPC() + adrAdd );
+        }       
     }
     /**
      * https://www.c64-wiki.de/wiki/BPL_$hhll
