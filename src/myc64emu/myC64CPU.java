@@ -598,11 +598,108 @@ public class myC64CPU {
                 cpy(memory.readSystemByte(zeroPage()),3); break;
             case 0xC5: // CMP https://www.c64-wiki.de/wiki/CPY_$ll
                 cmp(memory.readSystemByte(zeroPage()),3); break;
+            case 0xC6: // DEC
+                dec(zeroPage(),5); break;
+            case 0xC8: // INY
+                iny();break;
+            case 0xC9: // CMP
+                cmp(getActOp(),2); break;
+            case 0xCA: // CMP
+                dex(); break;
+            case 0xCC: // CMP 
+                cpy(memory.readSystemByte(absoluteAdr()),4); break;
+            case 0xCD: // CMP
+                cmp(memory.readSystemByte(absoluteAdr()),4); break;
+            case 0xCE: //DEC 
+                dec(absoluteAdr(),6); break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
         }
         return true;
+    }
+    /**
+     * INC
+     * @param val
+     * @param cycles  
+     */
+    private void inc(int adr, int cycles) {
+        int val = memory.readSystemByte(adr);
+        // read write write
+        memory.writeSystemByte(adr, val);
+        if ( val == 0xFF )
+            val = 0x00;
+        else
+            val++;
+        memory.writeSystemByte(adr, val);
+        setFlagZ(val);
+        setFlagN(val);
+        addCycleCnt(2);
+    }
+    /**
+     * INX
+     */
+    private void inx() {
+        if ( getRegX() == 0xFF )
+            setRegX(0x00);
+        else
+            setRegX(getRegX()+1);
+        setFlagZ(getRegX());
+        setFlagN(getRegX());
+        addCycleCnt(2);
+    }
+    /**
+     * INY
+     */
+    private void iny() {
+        if ( getRegY() == 0xFF )
+            setRegY(0x00);
+        else
+            setRegY(getRegY()+1);
+        setFlagZ(getRegY());
+        setFlagN(getRegY());
+        addCycleCnt(2);
+    }
+    /**
+     * DEC
+     * @param val
+     * @param cycles 
+     */
+    private void dec(int adr, int cycles) {
+        int val = memory.readSystemByte(adr);
+        // read write write
+        memory.writeSystemByte(adr, val);
+        if ( val == 0 )
+            val = 0xFF;
+        else
+            val--;
+        memory.writeSystemByte(adr, val);
+        setFlagZ(val);
+        setFlagN(val);
+        addCycleCnt(cycles);
+        
+    }
+    /**
+     * DEX
+     */
+    private void dex() {
+        // wrap around
+        if ( 0 == getRegX() )
+            setRegX( 0xFF );
+        else 
+            setRegX( getRegX()-1 );
+        addCycleCnt(2);
+    }
+    /**
+     * DEY
+     */
+    private void dey() {
+        // wrap around
+        if ( 0 == getRegY() )
+            setRegY( 0xFF );
+        else 
+            setRegY( getRegY()-1 );
+        addCycleCnt(2);
     }
     /**
      * CMP 
@@ -648,7 +745,7 @@ public class myC64CPU {
         setFlagZ( res & 0xFF );
         setFlagN( res & 0xFF );
         addCycleCnt(cycles);
-    }
+    }    
     /**
      * TSX
      */
@@ -693,18 +790,7 @@ public class myC64CPU {
         setFlagZ(getRegA());
         setFlagN(getRegA());
         addCycleCnt(2);
-    }
-    /**
-     * DEY
-     */
-    private void dey() {
-        // wrap around
-        if ( 0 == getRegY() )
-            setRegY( 0xFF );
-        else 
-            setRegY( getRegSP()-1 );
-        addCycleCnt(2);
-    }
+    }    
     /**
      * LDA
      */
