@@ -544,11 +544,44 @@ public class myC64CPU {
                 setRegSP(getRegX());addCycleCnt(2);break;
             case 0x9D: // STA https://www.c64-wiki.de/wiki/STA_$hhll,_X
                 sta(absoluteIndiziertX(),5);break;
+            case 0xA0: // LDY https://www.c64-wiki.de/wiki/LDY_(RAUTE)$nn
+                ldy(getActOp(),2);break;
+            case 0xA1: // LDA https://www.c64-wiki.de/wiki/LDA_($ll,_X)
+                lda(memory.readSystemByte(indirektIndiziertZero_X()),6);break;
+            case 0xA2: // LDX https://www.c64-wiki.de/wiki/LDX_(RAUTE)$nn
+                ldx(getActOp(),2);break;
+            case 0xA4: // LDY https://www.c64-wiki.de/wiki/LDY_$ll
+                ldy(memory.readSystemByte(zeroPage()),3);break;
+            case 0xA5: // LDA https://www.c64-wiki.de/wiki/LDA_$ll
+                lda(memory.readSystemByte(zeroPage()),3);break;
+            case 0xA6: // LDX https://www.c64-wiki.de/wiki/LDX_$ll
+                ldx(memory.readSystemByte(zeroPage()),3);break;
+            case 0xA8: // TAY https://www.c64-wiki.de/wiki/TAY
+                tay(); break;
+            case 0xA9: // LDA https://www.c64-wiki.de/wiki/LDA_(RAUTE)$nn
+                lda(getActOp(),2);break;
+            case 0xAA: // TAX https://www.c64-wiki.de/wiki/TAX
+                tax();break;
+            case 0xAC: // LDY https://www.c64-wiki.de/wiki/LDY_$hhll
+                ldy(memory.readSystemByte(absoluteAdr()),4);break;
+            case 0xAD: // LDA https://www.c64-wiki.de/wiki/LDA_$hhll
+                lda(memory.readSystemByte(absoluteAdr()),4);break;
+            case 0xAE: // LDX https://www.c64-wiki.de/wiki/LDX_$hhll
+                ldx(memory.readSystemByte(absoluteAdr()),4);break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
         }
         return true;
+    }
+    /**
+     * TAY
+     */
+    private void tay() {
+        setRegY(getRegA());
+        setFlagZ(getRegY());
+        setFlagN(getRegY());
+        addCycleCnt(2);
     }
     /**
      * TYA
@@ -557,6 +590,15 @@ public class myC64CPU {
         setRegA(getRegY());
         setFlagZ(getRegA());
         setFlagN(getRegA());
+        addCycleCnt(2);
+    }
+    /**
+     * TAX
+     */
+    private void tax() {
+        setRegX(getRegA());
+        setFlagZ(getRegX());
+        setFlagN(getRegX());
         addCycleCnt(2);
     }
     /**
@@ -580,6 +622,15 @@ public class myC64CPU {
         addCycleCnt(2);
     }
     /**
+     * LDA
+     */
+    private void lda(int val, int cycles){
+        setRegA(val);
+        setFlagZ(getRegA());
+        setFlagN(getRegA());
+        addCycleCnt(cycles);
+    }
+    /**
      * STA 
      */
     private void sta(int val, int cycles){
@@ -587,10 +638,28 @@ public class myC64CPU {
         addCycleCnt(cycles);
     }
     /**
+     * LDX
+     */
+    private void ldx(int val, int cycles){
+        setRegX(val);
+        setFlagZ(getRegX());
+        setFlagN(getRegX());
+        addCycleCnt(cycles);
+    }
+    /**
      * STX
      */
     private void stx(int val, int cycles){
         memory.writeSystemByte(val, getRegX());
+        addCycleCnt(cycles);
+    }
+    /**
+     * LDY
+     */
+    private void ldy(int val, int cycles){
+        setRegY(val);
+        setFlagZ(getRegY());
+        setFlagN(getRegY());
         addCycleCnt(cycles);
     }
     /**
