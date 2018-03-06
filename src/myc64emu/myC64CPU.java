@@ -568,11 +568,95 @@ public class myC64CPU {
                 lda(memory.readSystemByte(absoluteAdr()),4);break;
             case 0xAE: // LDX https://www.c64-wiki.de/wiki/LDX_$hhll
                 ldx(memory.readSystemByte(absoluteAdr()),4);break;
+            case 0xB0: // BCS https://www.c64-wiki.de/wiki/BCS_$hhll
+                bcs(); break;
+            case 0xB1: // LDA https://www.c64-wiki.de/wiki/LDA_($ll),_Y
+                lda(memory.readSystemByte(indirektNachindiziertZero_Y()),5);break;
+            case 0xB4: // LDY https://www.c64-wiki.de/wiki/LDY_$ll,_X
+                ldy(memory.readSystemByte(zeroXAdr()),3);break;
+            case 0xB5: // LDA https://www.c64-wiki.de/wiki/LDA_$ll,_X
+                lda(memory.readSystemByte(zeroXAdr()),3);break;
+            case 0xB6: // LDA https://www.c64-wiki.de/wiki/LDX_$ll,_Y
+                ldx(memory.readSystemByte(zeroYAdr()),3);break;
+            case 0xB8: // CLV https://www.c64-wiki.de/wiki/CLV
+                setFlagV(false);addCycleCnt(2);break;
+            case 0XB9: // LDA https://www.c64-wiki.de/wiki/LDA_$hhll,_Y
+                lda(memory.readSystemByte(absoluteIndiziertY()),4);break;
+            case 0xBA: // TSX https://www.c64-wiki.de/wiki/TSX
+                tsx();break;
+            case 0xBC: // LDY https://www.c64-wiki.de/wiki/LDY_$hhll,_X
+                ldy(memory.readSystemByte(absoluteIndiziertX()),4);break;
+            case 0xBD: // LDA https://www.c64-wiki.de/wiki/LDA_$hhll,_X
+                lda(memory.readSystemByte(absoluteIndiziertX()),4);break;
+            case 0xBE: // LDX https://www.c64-wiki.de/wiki/LDX_$hhll,_Y
+                ldx(memory.readSystemByte(absoluteIndiziertY()),4);break;
+            case 0xC0: // CPY https://www.c64-wiki.de/wiki/CPY_(RAUTE)$nn
+                cpy(getActOp(),2); break;
+            case 0xC1: // CMP https://www.c64-wiki.de/wiki/CMP_($ll,_X)
+                cmp(memory.readSystemByte(indirektIndiziertZero_X()),6); break;
+            case 0xC4: // CPY https://www.c64-wiki.de/wiki/CPY_$ll
+                cpy(memory.readSystemByte(zeroPage()),3); break;
+            case 0xC5: // CMP https://www.c64-wiki.de/wiki/CPY_$ll
+                cmp(memory.readSystemByte(zeroPage()),3); break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
         }
         return true;
+    }
+    /**
+     * CMP 
+     * @param val 8Bit value to compare with reg A
+     * @param cycles number of cycles used.
+     */
+    private void cmp(int val, int cycles) {
+        int res = getRegA() - ( val & 0xFF );
+        if ( res < 0x100 )
+            setFlagC(true);
+        else
+            setFlagC(false);
+        setFlagZ( res & 0xFF );
+        setFlagN( res & 0xFF );
+        addCycleCnt(cycles);
+    }
+    /**
+     * CPX 
+     * @param val 8Bit value to compare with reg X
+     * @param cycles number of cycles used.
+     */
+    private void cpx(int val, int cycles) {
+        int res = getRegX() - ( val & 0xFF );
+        if ( res < 0x100 )
+            setFlagC(true);
+        else
+            setFlagC(false);
+        setFlagZ( res & 0xFF );
+        setFlagN( res & 0xFF );
+        addCycleCnt(cycles);
+    }
+    /**
+     * CPY 
+     * @param val 8Bit value to compare with reg Y
+     * @param cycles number of cycles used.
+     */
+    private void cpy(int val, int cycles) {
+        int res = getRegY() - ( val & 0xFF );
+        if ( res < 0x100 )
+            setFlagC(true);
+        else
+            setFlagC(false);
+        setFlagZ( res & 0xFF );
+        setFlagN( res & 0xFF );
+        addCycleCnt(cycles);
+    }
+    /**
+     * TSX
+     */
+    private void tsx() {
+        setRegX(getRegSP());
+        setFlagZ(getRegX());
+        setFlagN(getRegX());
+        addCycleCnt(2);
     }
     /**
      * TAY
@@ -685,7 +769,7 @@ public class myC64CPU {
      * @param cycles amount of cycle
      */
     private void adc(int val, int cycles) {
-        int res = getRegA() + val + ( getFlagC() ? 1 : 0);
+        int res = getRegA() + (val & 0xFF) + ( getFlagC() ? 1 : 0);
         if ( getFlagD() ) {
             // BCD codiert https://de.wikipedia.org/wiki/BCD-Code
             int xorAdd = myC64Tools.xor(myC64Tools.xor(getRegA(),val ),res);
@@ -852,6 +936,20 @@ public class myC64CPU {
         int adrAdd = getActOp();
         addCycleCnt(2);
         if ( !getFlagC() ) {
+            addCycleCnt(1);
+            // jump over page needs extra cycle
+            if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
+                addCycleCnt(1);
+            setRegPC( getRegPC() + adrAdd );
+        }       
+    }
+    /**
+     * https://www.c64-wiki.de/wiki/BCS_$hhll
+     */
+    private void bcs() {
+        int adrAdd = getActOp();
+        addCycleCnt(2);
+        if ( getFlagC() ) {
             addCycleCnt(1);
             // jump over page needs extra cycle
             if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
