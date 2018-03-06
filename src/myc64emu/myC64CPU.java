@@ -458,7 +458,7 @@ public class myC64CPU {
                 lsrMemRead(zeroXAdr(), 6); break;
             case 0x58: // CLI https://www.c64-wiki.de/wiki/CLI
                 setFlagI(false); addCycleCnt(2); break;
-            case 0x59: // EOR 
+            case 0x59: // EOR https://www.c64-wiki.de/wiki/EOR_$hhll,_Y
                 eor(memory.readSystemByte(absoluteIndiziertY()),4); break;
             case 0x5D: // EOR https://www.c64-wiki.de/wiki/EOR_$hhll,_X
                 eor(memory.readSystemByte(absoluteIndiziertX()),4); break;
@@ -484,6 +484,22 @@ public class myC64CPU {
                 adc(memory.readSystemByte(absoluteAdr()),4);break;
             case 0x6E: // ROR
                 rorMemRead(absoluteAdr(), 6); break;
+            case 0x70: // BVS https://www.c64-wiki.de/wiki/BVS_$hhll
+                bvs(); break;
+            case 0x71: // ADC https://www.c64-wiki.de/wiki/ADC_($ll),_Y
+                adc(memory.readSystemByte(indirektNachindiziertZero_Y()),5);break;
+            case 0x75: // ADC https://www.c64-wiki.de/wiki/ADC_$ll,_X
+                adc(memory.readSystemByte(zeroXAdr()),4);break;
+            case 0x76: // ROR https://www.c64-wiki.de/wiki/ROR_$ll,_X
+                rorMemRead(zeroXAdr(), 6); break;
+            case 0x78: // SEI https://www.c64-wiki.de/wiki/SEI
+                setFlagI(true); addCycleCnt(2); break;
+            case 0x79: // ADC https://www.c64-wiki.de/wiki/ADC_$hhll,_Y
+                adc(memory.readSystemByte(absoluteIndiziertY()),4); break;
+            case 0x7D: // ADC  https://www.c64-wiki.de/wiki/ADC_$hhll,_X
+                adc(absoluteIndiziertX(),4); break;
+            case 0x7E: // ROR https://www.c64-wiki.de/wiki/ROR_$hhll,_X
+                rorMemRead(absoluteIndiziertX(), 7); break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
@@ -682,11 +698,27 @@ public class myC64CPU {
     }
     /**
      * http://www.6502.org/tutorials/6502opcodes.html#BVC
+     * branch when overflow false
      */
     private void bvc() {
         int adrAdd = getActOp();
         addCycleCnt(2);
         if ( !getFlagV()) {
+            addCycleCnt(1);
+            // jump over page needs extra cycle
+            if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
+                addCycleCnt(1);
+            setRegPC( getRegPC() + adrAdd );
+        }               
+    }
+    /**
+     * http://www.6502.org/tutorials/6502opcodes.html#BVS
+     * branch when overflow true
+     */
+    private void bvs() {
+        int adrAdd = getActOp();
+        addCycleCnt(2);
+        if ( getFlagV()) {
             addCycleCnt(1);
             // jump over page needs extra cycle
             if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
@@ -710,7 +742,7 @@ public class myC64CPU {
     /**
      * https://www.c64-wiki.de/wiki/RTI
      */
-    public void rti() {
+    private void rti() {
         setRegSR( pop() );
         int lowByte  = pop();
         int highByte = pop();
