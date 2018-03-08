@@ -612,6 +612,22 @@ public class myC64CPU {
                 cmp(memory.readSystemByte(absoluteAdr()),4); break;
             case 0xCE: //DEC 
                 dec(absoluteAdr(),6); break;
+            case 0xD0: // BNE https://www.c64-wiki.de/wiki/BNE_$hhll
+                bne(); break;
+            case 0xD1: // CMP https://www.c64-wiki.de/wiki/CMP_($ll),_Y
+                cmp(memory.readSystemByte(indirektNachindiziertZero_Y()),5);break;
+            case 0xD5: // CMP https://www.c64-wiki.de/wiki/CMP_$ll,_X
+                cmp(memory.readSystemByte(zeroXAdr()),4);break;
+            case 0xD6: // DEC https://www.c64-wiki.de/wiki/DEC_$ll,_X
+                dec(zeroXAdr(),6);break;
+            case 0xD8: // CLD https://www.c64-wiki.de/wiki/CLD
+                setFlagD(false);addCycleCnt(2);break;
+            case 0xD9: // CMP https://www.c64-wiki.de/wiki/CMP_$hhll,_Y
+                cmp(memory.readSystemByte(absoluteIndiziertY()),4);break;
+            case 0xDD: // CMP https://www.c64-wiki.de/wiki/CMP_$hhll,_X
+                cmp(memory.readSystemByte(absoluteIndiziertX()),4);break;
+            case 0xDE: //DEC https://www.c64-wiki.de/wiki/DEC_$hhll,_X
+                dec(absoluteIndiziertX(),7); break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
@@ -998,6 +1014,20 @@ public class myC64CPU {
         setFlagZ(getRegA());
         setFlagN(getRegA());
         addCycleCnt(cycles); 
+    }
+    /**
+     * https://www.c64-wiki.de/wiki/BNE_$hhll
+     */
+    private void bne() {
+        int adrAdd = getActOp();
+        addCycleCnt(2);
+        if ( !getFlagZ() ) {
+            addCycleCnt(1);
+            // jump over page needs extra cycle
+            if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
+                addCycleCnt(1);
+            setRegPC( getRegPC() + adrAdd );
+        }
     }
     /**
      * http://www.6502.org/tutorials/6502opcodes.html#PC
