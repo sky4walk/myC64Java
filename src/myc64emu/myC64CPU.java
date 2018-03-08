@@ -628,6 +628,8 @@ public class myC64CPU {
                 cmp(memory.readSystemByte(absoluteIndiziertX()),4);break;
             case 0xDE: //DEC https://www.c64-wiki.de/wiki/DEC_$hhll,_X
                 dec(absoluteIndiziertX(),7); break;
+            case 0xE0: // CPX https://www.c64-wiki.de/wiki/CPX_(RAUTE)$nn
+                cpx(getActOp(),2);break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
@@ -896,6 +898,15 @@ public class myC64CPU {
         setFlagZ(res);
         setFlagN(res);
         setRegA(res);
+    }
+    /**
+     * https://www.c64-wiki.de/wiki/SBC_($ll,_X)
+     * @param val
+     * @param cycles 
+     */
+    private void sbc(int val, int cycles) {
+        // call adc with inverted val -> -val-1
+        adc(myC64Tools.xor(val, 0xFF),cycles);
     }
     /**
      * special lri which have an added write command 
