@@ -630,6 +630,26 @@ public class myC64CPU {
                 dec(absoluteIndiziertX(),7); break;
             case 0xE0: // CPX https://www.c64-wiki.de/wiki/CPX_(RAUTE)$nn
                 cpx(getActOp(),2);break;
+            case 0xE1: // SBC https://www.c64-wiki.de/wiki/SBC_($ll,_X)
+                sbc(memory.readSystemByte(indirektIndiziertZero_X()),6); break;
+            case 0xE4: // CPX https://www.c64-wiki.de/wiki/CPX_$ll
+                cpx(memory.readSystemByte(zeroPage()),3);break;
+            case 0xE5: // SBC https://www.c64-wiki.de/wiki/SBC_$ll
+                sbc(memory.readSystemByte(zeroPage()),3); break;
+            case 0xE6: // INC https://www.c64-wiki.de/wiki/INC_$ll
+                inc(zeroPage(),5);break;
+            case 0xE8: // INX https://www.c64-wiki.de/wiki/INX
+                inx();break;
+            case 0xE9: // SBC https://www.c64-wiki.de/wiki/SBC_(RAUTE)$nn
+                sbc(getActOp(),2);break;
+            case 0xEA: // NOP https://www.c64-wiki.de/wiki/NOP
+                addCycleCnt(2);
+            case 0xEC: // CPX https://www.c64-wiki.de/wiki/CPX_$hhll
+                cpx(memory.readSystemByte(absoluteAdr()),4);break;
+            case 0xED: // SBC https://www.c64-wiki.de/wiki/SBC_$hhll
+                sbc(memory.readSystemByte(absoluteAdr()),4);break;
+            case 0xEE: // INC https://www.c64-wiki.de/wiki/INC_$hhll
+                inc(absoluteAdr(),4);break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
