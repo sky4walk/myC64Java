@@ -767,7 +767,7 @@ public class myC64CPU {
      */
     private void cmp(int val, int cycles) {
         int res = getRegA() - ( val & 0xFF );
-        if ( ( val & 0xFF ) >= getRegA() )
+        if ( ( val & 0xFF ) <= getRegA() )
             setFlagC(true);
         else
             setFlagC(false);
@@ -782,7 +782,7 @@ public class myC64CPU {
      */
     private void cpx(int val, int cycles) {
         int res = getRegX() - ( val & 0xFF );
-        if ( ( val & 0xFF ) > getRegX() )
+        if ( ( val & 0xFF ) <= getRegX() )
             setFlagC(true);
         else
             setFlagC(false);
@@ -797,7 +797,7 @@ public class myC64CPU {
      */
     private void cpy(int val, int cycles) {
         int res = getRegY() - ( val & 0xFF );
-        if ( ( val & 0xFF ) > getRegY() )
+        if ( ( val & 0xFF ) <= getRegY() )
             setFlagC(true);
         else
             setFlagC(false);
