@@ -643,7 +643,7 @@ public class myC64CPU {
             case 0xE9: // SBC https://www.c64-wiki.de/wiki/SBC_(RAUTE)$nn
                 sbc(getActOp(),2);break;
             case 0xEA: // NOP https://www.c64-wiki.de/wiki/NOP
-                addCycleCnt(2);
+                addCycleCnt(2); break;
             case 0xEC: // CPX https://www.c64-wiki.de/wiki/CPX_$hhll
                 cpx(memory.readSystemByte(absoluteAdr()),4);break;
             case 0xED: // SBC https://www.c64-wiki.de/wiki/SBC_$hhll
@@ -1074,7 +1074,7 @@ public class myC64CPU {
             // jump over page needs extra cycle
             if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
                 addCycleCnt(1);
-            setRegPC( getRegPC() + adrAdd );
+            setRegPC( getRegPC() + myC64Tools.getSignedByte(adrAdd) );
         }
     }
     /**
@@ -1088,7 +1088,8 @@ public class myC64CPU {
             // jump over page needs extra cycle
             if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
                 addCycleCnt(1);
-            setRegPC( getRegPC() + adrAdd );
+            int t = myC64Tools.getSignedByte(adrAdd);
+            setRegPC( getRegPC() + myC64Tools.getSignedByte(adrAdd) );
         }
     }
     /**
@@ -1104,7 +1105,7 @@ public class myC64CPU {
             // jump over page needs extra cycle
             if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
                 addCycleCnt(1);
-            setRegPC( getRegPC() + adrAdd );
+            setRegPC( getRegPC() + myC64Tools.getSignedByte(adrAdd) );
         }
     }
     /**
@@ -1118,7 +1119,7 @@ public class myC64CPU {
             // jump over page needs extra cycle
             if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
                 addCycleCnt(1);
-            setRegPC( getRegPC() + adrAdd );
+            setRegPC( getRegPC() + myC64Tools.getSignedByte(adrAdd) );
         }       
     }
     /**
@@ -1132,7 +1133,7 @@ public class myC64CPU {
             // jump over page needs extra cycle
             if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
                 addCycleCnt(1);
-            setRegPC( getRegPC() + adrAdd );
+            setRegPC( getRegPC() + myC64Tools.getSignedByte(adrAdd) );
         }       
     }
     /**
@@ -1146,7 +1147,7 @@ public class myC64CPU {
             // jump over page needs extra cycle
             if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
                 addCycleCnt(1);
-            setRegPC( getRegPC() + adrAdd );
+            setRegPC( getRegPC() + myC64Tools.getSignedByte(adrAdd) );
         }       
     }
     /**
@@ -1161,7 +1162,7 @@ public class myC64CPU {
             // jump over page needs extra cycle
             if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
                 addCycleCnt(1);
-            setRegPC( getRegPC() + adrAdd );
+            setRegPC( getRegPC() + myC64Tools.getSignedByte(adrAdd) );
         }               
     }
     /**
@@ -1176,7 +1177,7 @@ public class myC64CPU {
             // jump over page needs extra cycle
             if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
                 addCycleCnt(1);
-            setRegPC( getRegPC() + adrAdd );
+            setRegPC( getRegPC() + myC64Tools.getSignedByte(adrAdd) );
         }               
     }
     /**
@@ -1256,22 +1257,17 @@ public class myC64CPU {
     }
     public void printOut() {
         String outStr = "";
-        outStr += "regA:\t";
-        outStr += myC64Tools.byte2hex(getRegA(),0);
-        outStr += "\nregX:\t";
-        outStr += myC64Tools.byte2hex(getRegX(),0);
-        outStr += "\nregY:\t";
-        outStr += myC64Tools.byte2hex(getRegY(),0);
-        outStr += "\nregSR:\t";
-        outStr += myC64Tools.byte2hex(getRegSR(),0);
-        outStr += "\nregSP:\t";
-        outStr += myC64Tools.byte2hex(getRegSP(),0);
-        outStr += "\nregPC:\t";
-        outStr += myC64Tools.byte2hex(getRegPC(),0);
-        outStr += "\ncycles:\t";
-        outStr += Integer.toString(getCycles());        
-        outStr += "\n";
-        outStr += "NV_BDIZO\n";
+        outStr += "PC\tMem[PC]\tMem[P2]\tMem[P3]\tA\tX\tY\tSR\tSP\tCyc\tNV_BDIZO\n";
+        outStr += myC64Tools.word2hex(getRegPC())   + "\t";
+        outStr += myC64Tools.byte2hex(memory.readSystemByte(getRegPC()),0)   + "\t";
+        outStr += myC64Tools.byte2hex(memory.readSystemByte(getRegPC()+1),0) + "\t";
+        outStr += myC64Tools.byte2hex(memory.readSystemByte(getRegPC()+2),0) + "\t";
+        outStr += myC64Tools.byte2hex(getRegA(),0)  + "\t";
+        outStr += myC64Tools.byte2hex(getRegX(),0)  + "\t";
+        outStr += myC64Tools.byte2hex(getRegY(),0)  + "\t";
+        outStr += myC64Tools.byte2hex(getRegSR(),0) + "\t";
+        outStr += myC64Tools.byte2hex(getRegSP(),0) + "\t";
+        outStr += Integer.toString(getCycles())     + "\t";
         outStr += getFlagN() ? 1 : 0;
         outStr += getFlagV() ? 1 : 0;
         outStr += "0";

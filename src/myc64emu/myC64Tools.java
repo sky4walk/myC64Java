@@ -122,4 +122,12 @@ public class myC64Tools {
     public static int xor( int val1, int val2 ) {
         return val1 ^ val2;
     }
+    public static int getSignedByte(int val) {
+        val &= 0xFF;
+        if ( testBit(val,7) ) {
+            return ( val - 0xFF ) - 1;
+        } else {
+            return val;
+        }
+    }
 }

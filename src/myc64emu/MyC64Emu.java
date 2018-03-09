@@ -36,15 +36,14 @@ public class MyC64Emu {
         /* run test program */
         while ( true ) {
             if ( regPC == cpu.getRegPC() ) {
-                myC64Tools.printOut("infinite loop at" + regPC + "\n");
+                myC64Tools.printOut("infinite loop at" + 
+                        myC64Tools.word2hex(regPC) + "\n");
                 return false;
             } else if ( 0x3463 == cpu.getRegPC() ) {
                 myC64Tools.printOut("test passed\n");
                 break;
             }
             regPC = cpu.getRegPC();
-            myC64Tools.printOut("Adr: "+myC64Tools.word2hex(regPC) + " OP: " +
-                    myC64Tools.byte2hex(mem.readRamByteDirect(regPC),0));
             cpu.printOut();
             if ( !cpu.emulate() ) {
                 return false;
