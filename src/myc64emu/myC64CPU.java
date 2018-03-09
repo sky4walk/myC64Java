@@ -650,6 +650,22 @@ public class myC64CPU {
                 sbc(memory.readSystemByte(absoluteAdr()),4);break;
             case 0xEE: // INC https://www.c64-wiki.de/wiki/INC_$hhll
                 inc(absoluteAdr(),4);break;
+            case 0xF0: // BEQ https://www.c64-wiki.de/wiki/BEQ_$hhll
+                beq();break;
+            case 0xF1: // SBC https://www.c64-wiki.de/wiki/SBC_($ll),_Y
+                sbc(memory.readSystemByte(indirektNachindiziertZero_Y()),5);break;
+            case 0xF5: // SBC https://www.c64-wiki.de/wiki/SBC_$ll,_X
+                sbc(memory.readRamByteDirect(zeroXAdr()),4);break;
+            case 0xF6: // INC https://www.c64-wiki.de/wiki/INC_$ll,_X
+                inc(zeroXAdr(),6);break;
+            case 0xF8: // SED https://www.c64-wiki.de/wiki/SED
+                setFlagD(true);addCycleCnt(2);break;                
+            case 0xF9: // SBC https://www.c64-wiki.de/wiki/SBC_$hhll,_Y
+                sbc(memory.readSystemByte(absoluteIndiziertY()),4);break;
+            case 0xFD: // SBC https://www.c64-wiki.de/wiki/SBC_$hhll,_X
+                sbc(memory.readSystemByte(absoluteIndiziertX()),4);break;
+            case 0xFE: // INC https://www.c64-wiki.de/wiki/INC_$hhll,_X
+                inc(absoluteIndiziertX(),7);break;
             default:
                 myC64Tools.printOut("Unknown instruction: "+op+" at "+getRegPC());
                 return false;
@@ -1045,6 +1061,21 @@ public class myC64CPU {
         setFlagZ(getRegA());
         setFlagN(getRegA());
         addCycleCnt(cycles); 
+    }
+    /**
+     * brranch if equal.
+     * https://www.c64-wiki.de/wiki/BEQ_$hhll
+     */
+    private void beq() {
+        int adrAdd = getActOp();
+        addCycleCnt(2);
+        if ( getFlagZ() ) {
+            addCycleCnt(1);
+            // jump over page needs extra cycle
+            if ( myC64Tools.pageJumpAdd( getRegPC(), adrAdd) )
+                addCycleCnt(1);
+            setRegPC( getRegPC() + adrAdd );
+        }
     }
     /**
      * https://www.c64-wiki.de/wiki/BNE_$hhll
