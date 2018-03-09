@@ -130,4 +130,12 @@ public class myC64Tools {
             return val;
         }
     }
+    public static int getUnsignedByte(int val) {
+        val &= 0xFF;
+        if ( testBit(val,7) ) {
+            return val;
+        } else {
+            return val;
+        }
+    }
 }

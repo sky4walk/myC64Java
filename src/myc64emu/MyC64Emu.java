@@ -19,7 +19,7 @@ public class MyC64Emu {
      * https://github.com/Klaus2m5/6502_65C02_functional_tests
      * @return returns true if cpu works correct.
      */
-    public boolean testCpu() {
+    public boolean testCpu(int stopVal) {
         int regPC = 0;
         int loadAdr = 0x0400;
         /* use whole RAM memory, no IO and ROMs */
@@ -35,6 +35,7 @@ public class MyC64Emu {
         cpu.setRegPC(loadAdr);
         /* run test program */
         while ( true ) {
+            cpu.printOut();
             if ( regPC == cpu.getRegPC() ) {
                 myC64Tools.printOut("infinite loop at" + 
                         myC64Tools.word2hex(regPC) + "\n");
@@ -42,9 +43,11 @@ public class MyC64Emu {
             } else if ( 0x3463 == cpu.getRegPC() ) {
                 myC64Tools.printOut("test passed\n");
                 break;
+            } 
+            if ( stopVal < 0x10000 && stopVal == cpu.getRegPC() ) {
+                myC64Tools.printOut("debug stopp\n");
             }
             regPC = cpu.getRegPC();
-            cpu.printOut();
             if ( !cpu.emulate() ) {
                 return false;
             }
@@ -66,7 +69,7 @@ public class MyC64Emu {
      */
     public static void main(String[] args) {
         MyC64Emu emu = new MyC64Emu();
-        emu.testCpu();        
+        emu.testCpu(0x05b6);        
     }
     
 }

@@ -761,12 +761,13 @@ public class myC64CPU {
     }
     /**
      * CMP 
+     * http://www.6502.org/tutorials/compare_beyond.html
      * @param val 8Bit value to compare with reg A
      * @param cycles number of cycles used.
      */
     private void cmp(int val, int cycles) {
         int res = getRegA() - ( val & 0xFF );
-        if ( res < 0x100 )
+        if ( ( val & 0xFF ) >= getRegA() )
             setFlagC(true);
         else
             setFlagC(false);
@@ -781,7 +782,7 @@ public class myC64CPU {
      */
     private void cpx(int val, int cycles) {
         int res = getRegX() - ( val & 0xFF );
-        if ( res < 0x100 )
+        if ( ( val & 0xFF ) > getRegX() )
             setFlagC(true);
         else
             setFlagC(false);
@@ -796,7 +797,7 @@ public class myC64CPU {
      */
     private void cpy(int val, int cycles) {
         int res = getRegY() - ( val & 0xFF );
-        if ( res < 0x100 )
+        if ( ( val & 0xFF ) > getRegY() )
             setFlagC(true);
         else
             setFlagC(false);
@@ -1127,6 +1128,7 @@ public class myC64CPU {
         }       
     }
     /**
+     * branch Carry = 1
      * https://www.c64-wiki.de/wiki/BCS_$hhll
      */
     private void bcs() {
@@ -1261,7 +1263,7 @@ public class myC64CPU {
     }
     public void printOut() {
         String outStr = "";
-        outStr += "PC\tMem[PC]\tMem[P2]\tMem[P3]\tA\tX\tY\tSR\tSP\tCyc\tNV_BDIZO\n";
+        outStr += "PC\tMem[PC]\tMem[P2]\tMem[P3]\tA\tX\tY\tSR\tSP\tCyc\tNV_BDIZC\n";
         outStr += myC64Tools.word2hex(getRegPC())   + "\t";
         outStr += myC64Tools.byte2hex(memory.readSystemByte(getRegPC()),0)   + "\t";
         outStr += myC64Tools.byte2hex(memory.readSystemByte(getRegPC()+1),0) + "\t";
