@@ -742,6 +742,8 @@ public class myC64CPU {
             setRegX( 0xFF );
         else 
             setRegX( getRegX()-1 );
+        setFlagZ(getRegX());
+        setFlagN(getRegX());
         addCycleCnt(2);
     }
     /**
@@ -753,6 +755,8 @@ public class myC64CPU {
             setRegY( 0xFF );
         else 
             setRegY( getRegY()-1 );
+        setFlagZ(getRegX());
+        setFlagN(getRegX());
         addCycleCnt(2);
     }
     /**
