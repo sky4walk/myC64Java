@@ -52,6 +52,12 @@ public class myC64Tools {
         outStr += String.format("%02x", addByte(val,add));
         return outStr;
     }
+    public static String word2hex(int val){
+        String outStr = "";
+        outStr += "0x";
+        outStr += String.format("%04x", val);
+        return outStr;
+    }
     public static boolean testBit(int reg, int pos) {
         return (reg & (1 << pos)) != 0;
     }

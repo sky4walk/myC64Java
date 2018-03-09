@@ -20,18 +20,19 @@ public class MyC64Emu {
      * @return returns true if cpu works correct.
      */
     public boolean testCpu() {
-        int regPC = 0x0400;
+        int regPC = 0;
+        int loadAdr = 0x0400;
         /* use whole RAM memory, no IO and ROMs */
         mem.writeSystemByte(myC64Config.addrProzessorPortReg, 0);        
         /* load test program to memory */
-        mem.loadRam(regPC, myC64PrgCpuTest.getMem1());
-        mem.loadRam(regPC + myC64PrgCpuTest.getMem1().length, 
+        mem.loadRam(loadAdr, myC64PrgCpuTest.getMem1());
+        mem.loadRam(loadAdr + myC64PrgCpuTest.getMem1().length, 
                 myC64PrgCpuTest.getMem2());
-        mem.loadRam(regPC + 
+        mem.loadRam(loadAdr + 
                 myC64PrgCpuTest.getMem1().length +
                 myC64PrgCpuTest.getMem2().length,
                 myC64PrgCpuTest.getMem3());
-        cpu.setRegPC(regPC);
+        cpu.setRegPC(loadAdr);
         /* run test program */
         while ( true ) {
             if ( regPC == cpu.getRegPC() ) {
@@ -42,6 +43,9 @@ public class MyC64Emu {
                 break;
             }
             regPC = cpu.getRegPC();
+            myC64Tools.printOut("Adr: "+myC64Tools.word2hex(regPC) + " OP: " +
+                    myC64Tools.byte2hex(mem.readRamByteDirect(regPC),0));
+            cpu.printOut();
             if ( !cpu.emulate() ) {
                 return false;
             }

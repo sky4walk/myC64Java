@@ -604,7 +604,7 @@ public class myC64CPU {
                 iny();break;
             case 0xC9: // CMP
                 cmp(getActOp(),2); break;
-            case 0xCA: // CMP
+            case 0xCA: // DEX
                 dex(); break;
             case 0xCC: // CMP 
                 cpy(memory.readSystemByte(absoluteAdr()),4); break;
@@ -1256,20 +1256,30 @@ public class myC64CPU {
     }
     public void printOut() {
         String outStr = "";
-        outStr += "regA: ";
+        outStr += "regA:\t";
         outStr += myC64Tools.byte2hex(getRegA(),0);
-        outStr += "\nregX: ";
+        outStr += "\nregX:\t";
         outStr += myC64Tools.byte2hex(getRegX(),0);
-        outStr += "\nregY: ";
+        outStr += "\nregY:\t";
         outStr += myC64Tools.byte2hex(getRegY(),0);
-        outStr += "\nregSR: ";
+        outStr += "\nregSR:\t";
         outStr += myC64Tools.byte2hex(getRegSR(),0);
-        outStr += "\nregSP: ";
+        outStr += "\nregSP:\t";
         outStr += myC64Tools.byte2hex(getRegSP(),0);
-        outStr += "\nregPC: ";
+        outStr += "\nregPC:\t";
         outStr += myC64Tools.byte2hex(getRegPC(),0);
-        outStr += "\ncycles: ";
+        outStr += "\ncycles:\t";
         outStr += Integer.toString(getCycles());        
+        outStr += "\n";
+        outStr += "NV_BDIZO\n";
+        outStr += getFlagN() ? 1 : 0;
+        outStr += getFlagV() ? 1 : 0;
+        outStr += "0";
+        outStr += getFlagB() ? 1 : 0;
+        outStr += getFlagD() ? 1 : 0;
+        outStr += getFlagI() ? 1 : 0;
+        outStr += getFlagZ() ? 1 : 0;
+        outStr += getFlagC() ? 1 : 0;
         outStr += "\n";
         myC64Tools.printOut( outStr );
     } 
