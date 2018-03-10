@@ -45,8 +45,8 @@ public class myC64CPU {
         regA  = 0;
         regX  = 0;
         regY  = 0;
-        regSR = 0;
         regSP = 0;
+        regSR = 0;
         decSP();
         regPC = memory.readSystemWord(myC64Config.addrResetVector);
         cycleCntr = 0;
@@ -71,14 +71,19 @@ public class myC64CPU {
     }
     /**
      * Status Register 
+     * Bit 4: B-Flag always true.
+     * Bit 5: always true.
      * enthaelt Flags
      * @return 
      */
     public int getRegSR() {
-        return regSR & 0xFF;
+        // Bit 5 is always on
+        int regTmp = myC64Tools.setBit(regSR & 0xFF, 5, true);
+        // B Flag is always returned true.
+        return myC64Tools.setBit(regTmp, 4, true);
     }
     private void setRegSR(int reg) {
-        regSR = reg & 0xFF;
+        regSR = reg & 0xFF;        
     }
     /**
      * Stack Pointer
@@ -375,7 +380,8 @@ public class myC64CPU {
             case 0x06: // ASL
                 aslMemRead(zeroPage(),5); break; 
             case 0x08: // PHP https://www.c64-wiki.de/wiki/PHP
-                push(getRegSR());addCycleCnt(3);break;
+                int regTmp = getRegSR();
+                push(regTmp);addCycleCnt(3);break;
             case 0x09: // ORA https://www.c64-wiki.de/wiki/ORA_(RAUTE)$nn 
                 ora(immidiate(),2); break;
             case 0x0A: // ASL https://www.c64-wiki.de/wiki/ASL
@@ -444,7 +450,7 @@ public class myC64CPU {
                 eor(memory.readSystemByte(zeroPage()),3); break;
             case 0x46: // LSR https://www.c64-wiki.de/wiki/LSR_$ll
                 lsrMemRead(zeroPage(), 5); break;
-            case 0x48: // PHA 
+            case 0x48: // PHA  https://www.c64-wiki.de/wiki/PHA
                 push(getRegA());addCycleCnt(3);break;
             case 0x49: // EOR
                 eor(getActOp(),2); break;
