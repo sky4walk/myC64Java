@@ -768,8 +768,8 @@ public class myC64CPU {
             setRegY( 0xFF );
         else 
             setRegY( getRegY()-1 );
-        setFlagZ(getRegX());
-        setFlagN(getRegX());
+        setFlagZ(getRegY());
+        setFlagN(getRegY());
         addCycleCnt(2);
     }
     /**
@@ -1096,7 +1096,7 @@ public class myC64CPU {
         }
     }
     /**
-     * https://www.c64-wiki.de/wiki/BNE_$hhll
+     * https://www.c64-wiki.de/wiki/cmp_$hhll
      */
     private void bne() {
         int adrAdd = getActOp();
