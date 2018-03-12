@@ -72,7 +72,7 @@ public class myC64Tools {
         return  addr & 0x00FF;
     }
     public static int getHighByte(int addr) {
-        return  addr & 0xFF00;
+        return  ( addr >> 8 ) & 0xFF;
     }
     /**
      * https://www.c64-wiki.de/wiki/Byte

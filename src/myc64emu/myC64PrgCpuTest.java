@@ -1349,7 +1349,7 @@ public class myC64PrgCpuTest {
         0628 : a9ff            >            lda #$ff                 ;allow test to change I-flag (no mask)
                                >
         062a : 48              >            pha         ;use stack to load status
-        062b : 28              >            plp
+        062b : 28              >            pl09b8p
 
         062c : 101a                     bpl nbr1        ;branches should not be taken
         062e : 501b                     bvc nbr2

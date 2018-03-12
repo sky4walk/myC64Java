@@ -283,8 +283,10 @@ public class myC64CPU {
      * @param val wert auf dem stapel ablegen.
      */
     private void push(int val) {
-        memory.writeSystemByte(
-                myC64Config.addrBaseStack+getRegSP(), val);
+        int adr = myC64Config.addrBaseStack+getRegSP();
+        memory.writeSystemByte(adr , val);
+        myC64Tools.printOut("PUSH Adr:"+myC64Tools.word2hex(adr) +
+                            " Val:"+myC64Tools.byte2hex(val, 0));
         decSP();
     }
     /**
@@ -293,8 +295,11 @@ public class myC64CPU {
      */
     private int pop() {
         incSP();
-        return memory.readSystemByte(
-                    myC64Config.addrBaseStack+getRegSP());
+        int adr = myC64Config.addrBaseStack+getRegSP();
+        int val = memory.readSystemByte(adr);                    
+        myC64Tools.printOut("POP: Adr:"+myC64Tools.word2hex(adr) +
+                            " Val:"+myC64Tools.byte2hex(val, 0));
+        return val;
     }
     /**
      * https://www.c64-wiki.de/wiki/Adressierung#Zeropage_Adressierung
@@ -381,7 +386,9 @@ public class myC64CPU {
                 aslMemRead(zeroPage(),5); break; 
             case 0x08: // PHP https://www.c64-wiki.de/wiki/PHP
                 int regTmp = getRegSR();
-                push(regTmp);addCycleCnt(3);break;
+                push(regTmp);
+                addCycleCnt(3);
+                break;
             case 0x09: // ORA https://www.c64-wiki.de/wiki/ORA_(RAUTE)$nn 
                 ora(immidiate(),2); break;
             case 0x0A: // ASL https://www.c64-wiki.de/wiki/ASL
@@ -1215,18 +1222,7 @@ public class myC64CPU {
         setRegPC(myC64Tools.getWord(lowByte,highByte));
         addCycleCnt(6);
     }
-    /**
-     * https://www.c64-wiki.de/wiki/RTS
-     */
-    public void rts() {
-        int lowByte = pop();
-        int highByte = pop();
-        int adr = myC64Tools.getWord(lowByte,highByte);
-        setRegPC(adr);
-        incPC();
-        addCycleCnt(6);
-    }
-    /**
+        /**
      *
      * https://www.c64-wiki.de/wiki/ORA_($ll,_X)
      */
@@ -1261,10 +1257,24 @@ public class myC64CPU {
      * https://www.c64-wiki.de/wiki/JSR_$hhll
      */
     private void jsr() {
-        int adr = absoluteAdr();
-        push(myC64Tools.getLowByte(getRegPC()-1));
-        push(myC64Tools.getHighByte(getRegPC()-1));
+        int adrJmp = absoluteAdr();
+        int adrPC = getRegPC();
+        int adrLo = myC64Tools.getLowByte(adrPC-1);
+        int adrHi = myC64Tools.getHighByte(adrPC-1);
+        push(adrHi);
+        push(adrLo);
+        setRegPC(adrJmp);
+        addCycleCnt(6);
+    }
+    /**
+     * https://www.c64-wiki.de/wiki/RTS
+     */
+    public void rts() {
+        int lowByte = pop();
+        int highByte = pop();
+        int adr = myC64Tools.getWord(lowByte,highByte);
         setRegPC(adr);
+        incPC();
         addCycleCnt(6);
     }
     public void printOut() {

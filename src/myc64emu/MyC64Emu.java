@@ -69,7 +69,7 @@ public class MyC64Emu {
      */
     public static void main(String[] args) {
         MyC64Emu emu = new MyC64Emu();
-        emu.testCpu(0x0690);        
+        emu.testCpu(0x09b8);        
     }
     
 }
