@@ -415,8 +415,10 @@ public class myC64CPU {
                 jsr(); break;
             case 0x21: // AND https://www.c64-wiki.de/wiki/AND_($ll,_X)
                 and(memory.readSystemByte(indirektIndiziertZero_X()),6); break;
-            case 0x24: // BIT 
-                bit(zeroPage(),3); break;
+            case 0x24: { // BIT 
+                int adr = zeroPage();
+                bit(adr,3); 
+                break; }
             case 0x25: // AND https://www.c64-wiki.de/wiki/AND_$ll
                 and(memory.readSystemByte(zeroPage()),3);break;
             case 0x26: // ROL https://www.c64-wiki.de/wiki/ROL_$ll
@@ -1063,7 +1065,7 @@ public class myC64CPU {
      */
     private void bit(int adr,int cycles) {
         int val = memory.readSystemByte(adr);
-        if ( myC64Tools.testBit(val,7) )
+        if ( myC64Tools.testBit(val,6) )
             setFlagV(true);
         else
             setFlagV(false);
