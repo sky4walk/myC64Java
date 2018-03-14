@@ -981,14 +981,15 @@ public class myC64CPU {
      * @return 
      */
     private int lsr(int val) {
-        int tmp = val >> 1;
         if ( myC64Tools.testBit(val,0) )
             setFlagC(true);
         else
             setFlagC(false);
-        setFlagZ(tmp);
-        setFlagN(tmp);
-        return tmp;
+        val = val >> 1;
+        val = myC64Tools.setBit(val,7, false);
+        setFlagZ(val);
+        setFlagN(val);
+        return val;
     }
     /**
      * EOR
