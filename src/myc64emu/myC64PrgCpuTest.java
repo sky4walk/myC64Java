@@ -10411,7 +10411,7 @@ public class myC64PrgCpuTest {
         27aa : 28              >            plp
 
         27ab : 360c                     rol zpt,x
-                                        tst_zx rROL,fROL,0
+                                        tst_zx rROL, ,0
         27ad : 08              >            php         ;save flags
         27ae : b50c            >            lda zpt,x
         27b0 : dd2002          >            cmp rROL,x    ;test result

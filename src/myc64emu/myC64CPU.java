@@ -351,7 +351,9 @@ public class myC64CPU {
      * @return 
      */
     private int absoluteIndiziertX() {
-        return getActOpWord() + getRegX();
+        int word = getActOpWord();
+        int x = getRegX();
+        return word + x;
     }
     /**
      * https://www.c64-wiki.de/wiki/Adressierung#Indirekte_X-indizierte_Zeropage-Adressierung
