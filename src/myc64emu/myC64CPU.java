@@ -315,7 +315,8 @@ public class myC64CPU {
      */
     private int zeroXAdr() {
         /* wrap around zero page */
-        return ( zeroPage() + getRegX() ) & 0xFF;
+        int adr = zeroPage() + getRegX();
+        return adr & 0xFF;
     }
     /**
      * https://www.c64-wiki.de/wiki/Adressierung#Zeropage_Y-indizierte_Adressierung
@@ -411,8 +412,10 @@ public class myC64CPU {
                 setFlagC(false);addCycleCnt(2);break;
             case 0x19: // ORA https://www.c64-wiki.de/wiki/ORA_$hhll,_Y
                 ora(memory.readSystemByte(absoluteIndiziertY()),4); break;
-            case 0x1D: // ASL https://www.c64-wiki.de/wiki/ASL_$hhll,_X
-                aslMemRead(absoluteIndiziertY(),7); break;
+            case 0x1D: // ORA https://www.c64-wiki.de/wiki/ORA_$hhll,_X
+                ora(memory.readSystemByte(absoluteIndiziertY()),4); break;
+            case 0x1E: // ASL https://www.c64-wiki.de/wiki/ASL_$hhll,_X
+                aslMemRead(absoluteIndiziertX(),7); break;
             case 0x20: // JSR
                 jsr(); break;
             case 0x21: // AND https://www.c64-wiki.de/wiki/AND_($ll,_X)
@@ -444,7 +447,7 @@ public class myC64CPU {
             case 0x35: // AND https://www.c64-wiki.de/wiki/AND_$ll,_X
                 and(memory.readSystemByte(zeroXAdr()),4); break;
             case 0x36: // ROL https://www.c64-wiki.de/wiki/ROL_$ll,_X
-                rolMemRead(memory.readSystemByte(zeroXAdr()), 6); break;
+                rolMemRead(zeroXAdr(), 6); break;
             case 0x38: // SEC https://www.c64-wiki.de/wiki/SEC
                 setFlagC(true); addCycleCnt(2); break;
             case 0x39: // AND https://www.c64-wiki.de/wiki/AND_$hhll,_X
@@ -452,7 +455,7 @@ public class myC64CPU {
             case 0x3D: // AND https://www.c64-wiki.de/wiki/AND_$hhll,_X
                 and(memory.readSystemByte(absoluteIndiziertX()),4); break;                
             case 0x3E: // AND https://www.c64-wiki.de/wiki/AND_$hhll,_X
-                rolMemRead(memory.readSystemByte(absoluteIndiziertX()),7); break;
+                rolMemRead(absoluteIndiziertX(),7); break;
             case 0x40: // RTI
                 rti(); break;
             case 0x41: // EOR https://www.c64-wiki.de/wiki/EOR_($ll,_X)
@@ -999,7 +1002,8 @@ public class myC64CPU {
      * http://www.6502.org/tutorials/6502opcodes.html#EOR
      */
     private void eor(int val,int cycles) {
-        setRegA( myC64Tools.xor(getRegA(),val ) );
+        int t = myC64Tools.xor( getRegA(), val );
+        setRegA( t );
         setFlagZ(getRegA());
         setFlagN(getRegA());
         addCycleCnt(cycles); 
@@ -1040,7 +1044,8 @@ public class myC64CPU {
     private void rolMemRead(int adr, int cycles) {
         int val = memory.readSystemByte(adr);
         memory.writeSystemByte(adr, val);
-        memory.writeSystemByte(adr, rol(val));
+        int t = rol(val);
+        memory.writeSystemByte(adr, t);
         addCycleCnt(cycles);
     }
     /**
