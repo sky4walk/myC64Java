@@ -413,7 +413,7 @@ public class myC64CPU {
             case 0x19: // ORA https://www.c64-wiki.de/wiki/ORA_$hhll,_Y
                 ora(memory.readSystemByte(absoluteIndiziertY()),4); break;
             case 0x1D: // ORA https://www.c64-wiki.de/wiki/ORA_$hhll,_X
-                ora(memory.readSystemByte(absoluteIndiziertY()),4); break;
+                ora(memory.readSystemByte(absoluteIndiziertX()),4); break;
             case 0x1E: // ASL https://www.c64-wiki.de/wiki/ASL_$hhll,_X
                 aslMemRead(absoluteIndiziertX(),7); break;
             case 0x20: // JSR
