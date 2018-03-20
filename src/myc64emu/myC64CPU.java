@@ -954,7 +954,7 @@ public class myC64CPU {
               myC64Tools.testBit(myC64Tools.xor(getRegA(),res ),7 ) ) {
             setFlagV(true);
         } else {
-            setFlagV(true);
+            setFlagV(false);
         }
         setFlagZ(res);
         setFlagN(res);
