@@ -5,6 +5,8 @@
 
 package myc64emu;
 
+import java.util.Random;
+
 /**
  *
  * @author Andre Betz mail@AndreBetz.de
@@ -69,7 +71,15 @@ public class MyC64Emu {
      */
     public static void main(String[] args) {
         MyC64Emu emu = new MyC64Emu();
-        myC64Screen screen = new myC64Screen();
+        
+        Random random = new Random();
+        myC64Screen screen = new myC64Screen(300,300);
+        for ( int y = 0; y < screen.getSizeY(); y++ ) {
+                for ( int x = 0; x < screen.getSizeX(); x++ ) {
+                    screen.setPixelCol(x, y, random.nextInt(256), random.nextInt(256), random.nextInt(256));
+                }
+        }
+
         
         //emu.testCpu(0x35b5);        
     }
